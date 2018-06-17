@@ -1,11 +1,11 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/16/2018 9:27:17 PM                         */
+/* Created on:     6/16/2018 10:00:27 PM                        */
 /*==============================================================*/
 
--- Drop database Licores
--- Create database Licores
 
+-- drop database Licores
+-- create database Licores
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
@@ -385,6 +385,7 @@ create table USUARIO (
    ID_TELEFONO          int                  null,
    ID_NIVEL             numeric(2)           null,
    ID_SUCURSAL          int                  null,
+   CONTRASENNA          varbinary(10)        null,
    FOTO                 varbinary(Max)       null,
    constraint PK_USUARIO primary key (CEDULA)
 )
