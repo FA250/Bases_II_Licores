@@ -1,8 +1,8 @@
 -- Verificar Usuario
-CREATE PROCEDURE verificarUsuario (@Cedula int, @Contrasenna varchar(10))
+CREATE PROCEDURE verificarUsuario (@Cedula int, @Contrasenna varchar(10), @tipo_Usuario numeric(2))
 AS
 BEGIN
-	select top (1) cedula from usuario where cedula=@Cedula and contrasenna=@Contrasenna
+	select top (1) cedula from usuario where cedula=@Cedula and contrasenna=@Contrasenna and ID_Nivel=@tipo_Usuario
 END
 GO
 
