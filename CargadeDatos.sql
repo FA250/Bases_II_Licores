@@ -4,7 +4,10 @@
 insert into Horario values(PARSE('7:00:00' AS time USING 'en-US'),PARSE('5:00:00' AS time USING 'en-US'),'L-V')
 
 -- Sucursal
-insert into Sucursal values (1,'SucursalPrueba','POINT (1 1)')
+insert into Sucursal values (1,'SucursalPrueba','POINT (1 1)'),
+							(1,'San Jose','POINT (2 2)'),
+							(1,'Cartago','POINT (8 -10)'),
+							(1,'Limon','POINT (23 4)')
 
 -- Tipos Usuario
 insert into Nivel values (1,'Administrador','Administra los datos de la aplicación puede insertar'),
