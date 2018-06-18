@@ -15,7 +15,7 @@ BEGIN
 	set @existe=null
 	select @existe=cedula from usuario where cedula=@Cedula
 
-	if @existe=null
+	if (Len(@existe)<1) or (@existe is null)
 	begin
 		declare @id_nombre int
 		set @id_nombre=NULL
@@ -25,13 +25,13 @@ BEGIN
 		set @id_telefono=NULL
 		select @id_telefono=id from TELEFONO where TELEFONO=@Telefono and CELULAR=@Celular
 	
-		if @id_nombre=NULL
+		if (@id_nombre is NULL) or (Len(@id_nombre)<1)
 		begin
 			insert into nombre values(@Cedula,@Nombre,@Apellido1,@Apellido2)
 			set @id_nombre=@Cedula
 		end
 	
-		if @id_telefono=NULL
+		if (@id_telefono is NULL) or (Len(@id_telefono)<1)
 		begin
 			insert into TELEFONO values (@Cedula,@Celular,@Telefono)
 			set @id_telefono=@cedula
@@ -69,7 +69,7 @@ BEGIN
 	set @existe=null
 	select @existe=count(id) from catalogo where id=@id
 
-	if @existe=null
+	if @existe is null
 	begin
 	  select 0
 	end
@@ -260,7 +260,7 @@ create table Temp_IDs_Catalogo_Venta(
 	ID_Catalogo_Venta int not null,
 	Identificacion_Cliente int not null,
 	primary key (ID))
-
+go
 
 -- Guarda los licores comprados previo a la creacion de la factura
 CREATE PROCEDURE registrarCatalogo_Venta (@Identificacion_Cliente int, @ID_Catalogo int, @Cantidad int, @Subtotal money)

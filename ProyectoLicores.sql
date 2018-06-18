@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/18/2018 2:28:57 AM                         */
+/* Created on:     6/18/2018 12:02:55 PM                        */
 /*==============================================================*/
 
 
@@ -267,7 +267,7 @@ go
 /* Table: COMBINACION                                           */
 /*==============================================================*/
 create table COMBINACION (
-   ID                   int                  not null,
+   ID                   int                  identity,
    PRODUCTO             varchar(35)          null,
    DESCRIPCION          varchar(200)         null,
    constraint PK_COMBINACION primary key (ID)
@@ -278,7 +278,7 @@ go
 /* Table: COMBINACIONCATALOGO                                   */
 /*==============================================================*/
 create table COMBINACIONCATALOGO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_CATALOGO          int                  null,
    ID_COMBINACION       int                  null,
    constraint PK_COMBINACIONCATALOGO primary key (ID)
@@ -289,7 +289,7 @@ go
 /* Table: DESCUENTO                                             */
 /*==============================================================*/
 create table DESCUENTO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    DESCUENTO            float                null,
    MONTO_MENSUAL        money                null,
    ACTIVO               bit                  null,
@@ -301,7 +301,7 @@ go
 /* Table: HORARIO                                               */
 /*==============================================================*/
 create table HORARIO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ENTRADA              time                 null,
    SALIDA               time                 null,
    DIAS                 varchar(16)          null,
@@ -313,7 +313,7 @@ go
 /* Table: INVENTARIO                                            */
 /*==============================================================*/
 create table INVENTARIO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_CATALOGO          int                  null,
    ID_SUCURSAL          int                  null,
    CANTIDAD             int                  null,
@@ -325,7 +325,7 @@ go
 /* Table: LUGAR_PROCEDENCIA                                     */
 /*==============================================================*/
 create table LUGAR_PROCEDENCIA (
-   ID                   int                  not null,
+   ID                   int                  identity,
    PAIS                 varchar(20)          null,
    constraint PK_LUGAR_PROCEDENCIA primary key (ID)
 )
@@ -335,7 +335,7 @@ go
 /* Table: METODO_PAGO                                           */
 /*==============================================================*/
 create table METODO_PAGO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    NOMBRE               varchar(15)          null,
    constraint PK_METODO_PAGO primary key (ID)
 )
@@ -368,7 +368,7 @@ go
 /* Table: SUCURSAL                                              */
 /*==============================================================*/
 create table SUCURSAL (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_HORARIO           int                  null,
    NOMBRE               varchar(20)          null,
    UBICACION            geometry             null,
@@ -391,7 +391,7 @@ go
 /* Table: TIPO_ANNEJADO                                         */
 /*==============================================================*/
 create table TIPO_ANNEJADO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    NOMBRE               varchar(20)          null,
    DESCRIPCION          varchar(200)         null,
    constraint PK_TIPO_ANNEJADO primary key (ID)
