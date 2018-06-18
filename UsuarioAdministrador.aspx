@@ -11,6 +11,7 @@
     <div>
     
         <br />
+        
         <asp:Label ID="label_consultarPrecio" runat="server" Text="Consultar Precio Producto"></asp:Label>
         <br />
         <br />
@@ -40,6 +41,7 @@
         <asp:Label ID="Label5" runat="server" style="z-index: 1; left: 407px; top: 144px; position: absolute" Text="Año Cosecha:"></asp:Label>
         <br />
         <asp:Button ID="Button2" runat="server" Text="Actualizar Precio" Width="333px" />
+        <asp:FileUpload ID="fileupload_imagenNuevoProducto" runat="server" style="z-index: 1; left: 413px; top: 313px; position: absolute; width: 165px" />
         <br />
         <br />
         <asp:DropDownList ID="dropdownlist_paisNuevoProducto" runat="server" style="z-index: 1; left: 412px; top: 372px; position: absolute; width: 165px">
@@ -48,7 +50,7 @@
         <asp:Label ID="label_productoMasVendido" runat="server" Text="Productos más vendidos:"></asp:Label>
         <br />
         <asp:Label ID="label_imagen" runat="server" style="z-index: 1; left: 409px; top: 279px; position: absolute" Text="Imagen:"></asp:Label>
-        <asp:Button ID="Button3" runat="server" style="z-index: 1; left: 414px; top: 477px; position: absolute; width: 167px" Text="Ingresar Producto" />
+        <asp:Button ID="button_ingresarProducto" runat="server" style="z-index: 1; left: 414px; top: 477px; position: absolute; width: 167px" Text="Ingresar Producto" OnClick="Button3_Click" />
         <asp:TextBox ID="textbox_idSucursalConsultaMasVendidos" runat="server" style="z-index: 1; left: 13px; top: 472px; position: absolute; width: 220px"></asp:TextBox>
         <asp:Label ID="Label10" runat="server" style="z-index: 1; left: 10px; top: 409px; position: absolute" Text="Productos sin salida:"></asp:Label>
         <br />
@@ -63,7 +65,6 @@
         <asp:TextBox ID="textbox_nombreNuevoProducto" runat="server" style="z-index: 1; left: 407px; top: 110px; position: absolute"></asp:TextBox>
         <asp:Label ID="Label7" runat="server" style="z-index: 1; left: 181px; top: 55px; position: absolute; width: 68px" Text="Id:"></asp:Label>
         <br />
-        <asp:TextBox ID="textbox_imagenPath" runat="server" style="z-index: 1; left: 409px; top: 308px; position: absolute"></asp:TextBox>
         <asp:Label ID="label_idSucursal" runat="server" style="z-index: 1; left: 638px; top: 79px; position: absolute" Text="Id Sucursal:"></asp:Label>
         <asp:Label ID="Label6" runat="server" style="z-index: 1; left: 638px; top: 191px; position: absolute" Text="Consulta de Ventas"></asp:Label>
         <asp:Label ID="label_fechaInicial" runat="server" style="z-index: 1; left: 645px; top: 403px; position: absolute; width: 137px" Text="Fecha Inicial"></asp:Label>
@@ -94,12 +95,10 @@
         <asp:DropDownList ID="dropdownlist_paisNuevoProducto0" runat="server" style="z-index: 1; left: 412px; top: 372px; position: absolute; width: 165px">
         </asp:DropDownList>
         <br />
-        <asp:Button ID="button_consultaSinSalida" runat="server" OnClick="Button4_Click" Text="Consultar Aquellos Sin Salida" Width="231px" style="z-index: 1; left: 13px; top: 629px; position: absolute" />
+        <asp:Button ID="button_consultaSinSalida" runat="server" OnClick="Button4_Click" Text="Consultar Aquellos Sin Salida" Width="231px" style="z-index: 1; left: 14px; top: 632px; position: absolute" />
         <br />
         <br />
         <asp:Label ID="label_paisNuevoProducto" runat="server" style="z-index: 1; left: 411px; top: 346px; position: absolute; width: 162px" Text="País:"></asp:Label>
-        <asp:DropDownList ID="DropDownList1" runat="server">
-        </asp:DropDownList>
         <br />
         <br />
         <asp:Button ID="button_Volver" runat="server" OnClick="button_Volver_Click" Text="Volver" />

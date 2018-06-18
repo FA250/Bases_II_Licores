@@ -145,5 +145,31 @@ namespace LicoreraWeb
         {
 
         }
+
+        protected void button_cargarImagen_Click(object sender, EventArgs e)
+        {
+            if (this.fileupload_imagenNuevoProducto.HasFile)
+            {
+                this.fileupload_imagenNuevoProducto.SaveAs("c:\\" + this.fileupload_imagenNuevoProducto.FileName);
+            }
+
+        }
+
+        protected void Button3_Click(object sender, EventArgs e) // Ingresar Producto Nuevo
+
+        {
+
+            int length = fileupload_imagenNuevoProducto.PostedFile.ContentLength;
+            byte[] picSize = new byte[length];
+            HttpPostedFile uplImage = fileupload_imagenNuevoProducto.PostedFile;
+            uplImage.InputStream.Read(picSize, 0, length);
+            // com.Parameters.AddWithValue("@Picture", picSize); 
+
+
+
+
+
+
+        }
     }
 }
