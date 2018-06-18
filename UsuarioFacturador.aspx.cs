@@ -5,12 +5,18 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+
 namespace LicoreraWeb
 {
     public partial class UsuarioFacturador : System.Web.UI.Page
     {
         List<int> listaIdProducto= new List<int>();
         List<int> listaCantidad = new List<int>();
+        SqlConnection conn;
 
 
         protected void Page_Load(object sender, EventArgs e)
@@ -20,6 +26,9 @@ namespace LicoreraWeb
 
         protected void button_agregarProducto_Click(object sender, EventArgs e)
         {
+
+            
+
             int cantidadProducto = 0;
             int idProducto = 0; 
 
@@ -50,9 +59,9 @@ namespace LicoreraWeb
             
         }
 
-        protected void Button1_Click(object sender, EventArgs e)
+        protected void Button1_Click(object sender, EventArgs e) // Facturar
         {
-            
+            this.conn = (SqlConnection)Session["SQL"];
         }
 
         protected void button_volver_Click(object sender, EventArgs e)

@@ -14,7 +14,7 @@
         <asp:Label ID="label_ingreseIDSucursal" runat="server" style="z-index: 1; left: 517px; top: 127px; position: absolute; width: 241px" Text="Ingrese el ID de sucursal"></asp:Label>
         <br />
         <asp:Label ID="label_consultaHorario" runat="server" style="z-index: 1; left: 512px; top: 94px; position: absolute" Text="Consulta de Horario de Sucursal"></asp:Label>
-        <asp:Button ID="button_consultarHorario" runat="server" style="z-index: 1; left: 516px; top: 207px; position: absolute; width: 253px" Text="Consultar Horario" />
+        <asp:Button ID="button_consultarHorario" runat="server" style="z-index: 1; left: 516px; top: 207px; position: absolute; width: 253px" Text="Consultar Horario" OnClick="button_consultarHorario_Click" />
         <br />
         <br />
         <asp:Label ID="label_consultarProducto" runat="server" style="z-index: 1; left: 140px; top: 92px; position: absolute; width: 234px" Text="Consulta de Producto"></asp:Label>

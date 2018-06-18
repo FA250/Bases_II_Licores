@@ -4,7 +4,15 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data.SqlClient; 
+using System.Data.SqlClient;
+
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.OleDb;
+
 
 namespace LicoreraWeb
 {
@@ -25,33 +33,16 @@ namespace LicoreraWeb
 
 
                 // Conexion a SQL 
-                String connectionString = "Data Source=//DESKTOP-R6CF7AS\\MSSQLSERVER;Initial Catalog=BDRestaurante; User ID =Jose;Password=1234";
+                SqlConnection conn = new SqlConnection();
+                conn.ConnectionString =
+                "Data Source=DESKTOP-R6CF7AS;" +
+                "Initial Catalog=BDRestaurantes;" +
+                "User id=Moke;" +
+                "Password=1234;";
+                conn.Open();
 
-                String ip = "186.176.116.137";
-                String port = "1433";
-                String user = "Jose";
-                String password = "1234";
-                String dataBaseName = "BDRestaurante";
-                String conString = "Data Source=" + ip + "," + port + ";Network Library=DBMSSOCN;Initial Catalog=" + dataBaseName + ";User ID=" + user + ";Password=" + password;
+                Session["SQL"] = conn; // El objeto queda en la sesion para poder ser compartido entre las paginas
 
-                SqlConnection cnn = new SqlConnection(connectionString);
-
-                try
-                {
-                    cnn.Open();
-                    Response.Write("<script>alert('Conexión a Base de Datos establecida') </script>");
-                    Console.WriteLine("Conexion establecida");
-                    cnn.Close();
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Conexion no establecida");
-                    Response.Write("<script>alert('Error en la conexion') </script>");
-                }
-
-
-                /*
 
                 String tipoUsuario = RadioButtonList1.SelectedItem.Text;
                 switch (tipoUsuario)
@@ -82,7 +73,7 @@ namespace LicoreraWeb
                 // Alerta debe seleccionar un tipo de usuario para poder ingresar
                 Response.Write("<script>alert('Seleccione un tipo de usuario') </script>");
                
-    */
+    
             }
 
 

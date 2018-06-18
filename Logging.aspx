@@ -23,13 +23,15 @@
             <asp:ListItem>Usuario de Consultas</asp:ListItem>
             <asp:ListItem>Usuario Facturador</asp:ListItem>
         </asp:RadioButtonList>
-        <asp:TextBox ID="TextBox1" runat="server" style="position: absolute; z-index: 1; left: 636px; top: 180px; width: 265px"></asp:TextBox>
+        <asp:TextBox ID="TextBox1" runat="server" style="position: absolute; z-index: 1; left: 638px; top: 148px; width: 265px"></asp:TextBox>
+        <asp:Label ID="label_contrasena" runat="server" style="z-index: 1; left: 639px; top: 182px; position: absolute; width: 266px" Text="Contraseña:"></asp:Label>
         <br />
         <br />
         <br />
-        <asp:Label ID="Label1" runat="server" style="position: absolute; z-index: 1; left: 632px; top: 141px" Text="Ingrese su número de identificación"></asp:Label>
+        <asp:Label ID="Label1" runat="server" style="position: absolute; z-index: 1; left: 639px; top: 122px" Text="Número de identificación"></asp:Label>
         <br />
         <br />
+        <asp:TextBox ID="TextBox2" runat="server" style="z-index: 1; left: 638px; top: 204px; position: absolute; width: 261px"></asp:TextBox>
         <br />
         <br />
         <br />
