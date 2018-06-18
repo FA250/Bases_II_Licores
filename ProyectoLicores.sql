@@ -1,11 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/16/2018 10:00:27 PM                        */
+/* Created on:     6/18/2018 2:28:57 AM                         */
 /*==============================================================*/
 
-
--- drop database Licores
--- create database Licores
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
@@ -107,6 +104,13 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('VENTA') and o.name = 'FK_VENTA___METODO_P')
+alter table VENTA
+   drop constraint FK_VENTA___METODO_P
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('VENTA') and o.name = 'FK_VENTA___SUCURSAL')
 alter table VENTA
    drop constraint FK_VENTA___SUCURSAL
@@ -177,6 +181,13 @@ go
 
 if exists (select 1
             from  sysobjects
+           where  id = object_id('METODO_PAGO')
+            and   type = 'U')
+   drop table METODO_PAGO
+go
+
+if exists (select 1
+            from  sysobjects
            where  id = object_id('NIVEL')
             and   type = 'U')
    drop table NIVEL
@@ -228,7 +239,7 @@ go
 /* Table: CATALOGO                                              */
 /*==============================================================*/
 create table CATALOGO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_ANNEJADO          int                  null,
    ID_PROCEDENCIA       int                  null,
    NOMBRE               varchar(20)          null,
@@ -243,7 +254,7 @@ go
 /* Table: CATALOGO_VENTA                                        */
 /*==============================================================*/
 create table CATALOGO_VENTA (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_CATALOGO          int                  null,
    ID_VENTA             int                  null,
    CANTIDAD             int                  null,
@@ -293,6 +304,7 @@ create table HORARIO (
    ID                   int                  not null,
    ENTRADA              time                 null,
    SALIDA               time                 null,
+   DIAS                 varchar(16)          null,
    constraint PK_HORARIO primary key (ID)
 )
 go
@@ -316,6 +328,16 @@ create table LUGAR_PROCEDENCIA (
    ID                   int                  not null,
    PAIS                 varchar(20)          null,
    constraint PK_LUGAR_PROCEDENCIA primary key (ID)
+)
+go
+
+/*==============================================================*/
+/* Table: METODO_PAGO                                           */
+/*==============================================================*/
+create table METODO_PAGO (
+   ID                   int                  not null,
+   NOMBRE               varchar(15)          null,
+   constraint PK_METODO_PAGO primary key (ID)
 )
 go
 
@@ -385,7 +407,7 @@ create table USUARIO (
    ID_TELEFONO          int                  null,
    ID_NIVEL             numeric(2)           null,
    ID_SUCURSAL          int                  null,
-   CONTRASENNA          varbinary(10)        null,
+   CONTRASENNA          varchar(10)          null,
    FOTO                 varbinary(Max)       null,
    constraint PK_USUARIO primary key (CEDULA)
 )
@@ -395,10 +417,11 @@ go
 /* Table: VENTA                                                 */
 /*==============================================================*/
 create table VENTA (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_USUARIO           int                  null,
    ID_SUCURSAL          int                  null,
    ID_DESCUENTO         int                  null,
+   ID_METODO_PAGO       int                  null,
    CANT_LICORES         int                  null,
    TOTAL_ITEMS          int                  null,
    IMPUESTO_VENTA       float                null,
@@ -477,6 +500,11 @@ go
 alter table VENTA
    add constraint FK_VENTA___DESCUENT foreign key (ID_DESCUENTO)
       references DESCUENTO (ID)
+go
+
+alter table VENTA
+   add constraint FK_VENTA___METODO_P foreign key (ID_METODO_PAGO)
+      references METODO_PAGO (ID)
 go
 
 alter table VENTA
