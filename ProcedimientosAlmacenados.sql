@@ -57,7 +57,14 @@ GO
 CREATE PROCEDURE consultarPrecio (@nombre varchar(20), @id int)
 AS
 BEGIN
-	select precio from Catalogo where nombre=isnull(@nombre,nombre) and id=isnull(@id,id)
+	if (Len(@nombre)<1) or (@nombre is null) and (Len(@id)<1) or (@id is null)
+	begin
+		select -1
+	end
+	else
+	begin
+		select precio from Catalogo where nombre=isnull(@nombre,nombre) and id=isnull(@id,id)
+	end
 END
 GO
 
@@ -69,7 +76,7 @@ BEGIN
 	set @existe=null
 	select @existe=count(id) from catalogo where id=@id
 
-	if @existe is null
+	if(Len(@existe)<1) or (@existe is null)
 	begin
 	  select 0
 	end
@@ -302,7 +309,7 @@ BEGIN
 		
 		select top (1) @ID_CV=ID_Catalogo_Venta from Temp_IDs_Catalogo_Venta where Identificacion_Cliente=@Identificacion_Cliente order by ID_Catalogo_Venta desc
 
-		if @ID_CV is not null
+		if (Len(@ID_CV)<1) or (@ID_CV is null)
 		begin
 			update Catalogo_Venta set ID_Venta=@ID_Venta where ID=@ID_CV
 			delete Temp_IDs_Catalogo_Venta where ID_Catalogo_Venta=@ID_CV

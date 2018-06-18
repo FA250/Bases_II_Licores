@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/18/2018 12:02:55 PM                        */
+/* Created on:     6/18/2018 3:04:50 PM                         */
 /*==============================================================*/
 
 
@@ -34,15 +34,22 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
-   where r.fkeyid = object_id('COMBINACIONCATALOGO') and o.name = 'FK_COMBINAC___COMBINAC')
-alter table COMBINACIONCATALOGO
+   where r.fkeyid = object_id('COMBINACION_CATALOGO') and o.name = 'FK_COMBINAC___CATALOGO')
+alter table COMBINACION_CATALOGO
+   drop constraint FK_COMBINAC___CATALOGO
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('COMBINACION_CATALOGO') and o.name = 'FK_COMBINAC___COMBINAC')
+alter table COMBINACION_CATALOGO
    drop constraint FK_COMBINAC___COMBINAC
 go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
-   where r.fkeyid = object_id('COMBINACIONCATALOGO') and o.name = 'FK_COMBINAC___TIPO_ANN')
-alter table COMBINACIONCATALOGO
+   where r.fkeyid = object_id('COMBINACION_CATALOGO') and o.name = 'FK_COMBINAC___TIPO_ANN')
+alter table COMBINACION_CATALOGO
    drop constraint FK_COMBINAC___TIPO_ANN
 go
 
@@ -146,9 +153,9 @@ go
 
 if exists (select 1
             from  sysobjects
-           where  id = object_id('COMBINACIONCATALOGO')
+           where  id = object_id('COMBINACION_CATALOGO')
             and   type = 'U')
-   drop table COMBINACIONCATALOGO
+   drop table COMBINACION_CATALOGO
 go
 
 if exists (select 1
@@ -275,13 +282,13 @@ create table COMBINACION (
 go
 
 /*==============================================================*/
-/* Table: COMBINACIONCATALOGO                                   */
+/* Table: COMBINACION_CATALOGO                                  */
 /*==============================================================*/
-create table COMBINACIONCATALOGO (
-   ID                   int                  identity,
+create table COMBINACION_CATALOGO (
+   ID                   int                  not null,
    ID_CATALOGO          int                  null,
    ID_COMBINACION       int                  null,
-   constraint PK_COMBINACIONCATALOGO primary key (ID)
+   constraint PK_COMBINACION_CATALOGO primary key (ID)
 )
 go
 
@@ -452,12 +459,17 @@ alter table CATALOGO_VENTA
       references VENTA (ID)
 go
 
-alter table COMBINACIONCATALOGO
+alter table COMBINACION_CATALOGO
+   add constraint FK_COMBINAC___CATALOGO foreign key (ID_CATALOGO)
+      references CATALOGO (ID)
+go
+
+alter table COMBINACION_CATALOGO
    add constraint FK_COMBINAC___COMBINAC foreign key (ID_COMBINACION)
       references COMBINACION (ID)
 go
 
-alter table COMBINACIONCATALOGO
+alter table COMBINACION_CATALOGO
    add constraint FK_COMBINAC___TIPO_ANN foreign key (ID_CATALOGO)
       references TIPO_ANNEJADO (ID)
 go
