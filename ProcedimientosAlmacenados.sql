@@ -1,3 +1,6 @@
+use Licores
+go
+
 -- Verificar Usuario
 CREATE PROCEDURE verificarUsuario (@Cedula int, @Contrasenna varchar(10), @tipo_Usuario numeric(2))
 AS
@@ -137,7 +140,7 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from catalogo where id_annejado=@id_annejado and ID_procedencia=@ID_procedencia and nombre=@nombre and anno_cosecha=@anno_cosecha	
+	select @existe=id from catalogo where id_annejado=@id_annejado and ID_procedencia=@ID_procedencia and nombre=@nombre and annocosecha=@anno_cosecha	
 
 	BEGIN TRY
 		BEGIN
@@ -165,7 +168,41 @@ BEGIN
 END
 GO
 
+-- Agregar foto producto
+CREATE PROCEDURE agregarFotoProducto (@ID_Producto int, @foto varbinary(max))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
 
+	declare @existe int
+	select @existe=id from catalogo where ID=@ID_Producto
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				update catalogo set foto=@foto
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
 
 
 -- Ventas por sucursal, licores y/o fechas
@@ -230,6 +267,8 @@ GO
 ----------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
 
+
+
 -- Consulta producto
 CREATE PROCEDURE consultaProducto (@ID_Sucursal int, @ID_producto int, @Nombre_Producto varchar(20))
 AS
@@ -237,7 +276,7 @@ BEGIN
 	declare @ubicacionActual geometry
 	Select @ubicacionActual=Ubicacion from Sucursal where ID=@ID_Sucursal
 
-	select C.Nombre, C.Precio, C.Foto, S.Nombre, S.Ubicacion.STDistance(@ubicacionActual)
+	select C.ID, C.Nombre, C.Precio, C.Foto, S.Nombre, S.Ubicacion.STDistance(@ubicacionActual), I.Cantidad
 	from Catalogo C join Inventario I on C.ID=I.ID_Catalogo
 			join Sucursal S on I.ID_Sucursal=S.ID
 	where C.ID=isnull(@ID_producto,C.ID) and C.Nombre like '%'+isnull(@Nombre_Producto,C.Nombre)+'%'
@@ -265,6 +304,19 @@ BEGIN
 END
 GO
 
+
+-- Consultas existencias por licor y tienda
+CREATE PROCEDURE consultaLicor_Tienda (@ID_Licor int, @Nombre_Licor varchar(20), @ID_Sucursal int, @Nombre_Sucursal varchar(20))
+AS
+BEGIN
+	select C.ID,C.Nombre, LP.Pais, C.AnnoCosecha, TA.Nombre as TipoAnnejado, C.Precio, C.Foto, I.Cantidad, S.Nombre as Sucursal
+	from Catalogo C join Lugar_Procedencia LP on C.ID_Procedencia=LP.ID
+			join Tipo_Annejado TA on C.ID_Annejado=TA.ID
+			join Inventario I on C.ID=I.ID_Catalogo
+			join Sucursal S on I.ID_Sucursal=S.ID
+	where C.ID=isnull(@ID_Licor,C.ID) and C.nombre like '%'+isnull(@Nombre_Licor,C.nombre)+'%' and S.ID=isnull(@ID_Sucursal,S.ID) and S.nombre like '%'+isnull(@Nombre_Sucursal,S.nombre)+'%'
+END
+GO
 
 ----------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
@@ -371,3 +423,257 @@ Begin
 	RETURN	
 END
 GO
+
+
+
+
+
+
+
+
+
+--------------- CRUD Licores sucursal ---------------
+
+-- Insertar licor en sucursal
+CREATE PROCEDURE agregarLicorSucursal (@ID_Producto int, @ID_Sucursal int, @Cantidad int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				insert into Inventario values (@ID_Producto,@ID_Sucursal,@Cantidad)
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion del licor en la sucursal',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar licor en sucursal
+CREATE PROCEDURE actualizarLicorSucursal (@ID_Producto int, @ID_Sucursal int, @Cantidad int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				update Inventario set Cantidad=@Cantidad where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion de la cantidad del licor',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar producto
+CREATE PROCEDURE eliminarLicorSucursal (@ID_Producto int, @ID_Sucursal int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				delete Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion licor en la sucursal',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar productos Sucursal
+CREATE PROCEDURE seleccionarLicorSucursal (@ID_Producto int, @ID_Sucursal int)
+AS
+BEGIN
+	select C.Nombre, C.AnnoCosecha, TA.Nombre as Annejado, LP.Pais as LugarProcedencia, I.Cantidad, S.Nombre as Sucursal
+	from Inventario I join Catalogo C on I.ID_Catalogo=C.ID
+		join Lugar_Procedencia LP on C.ID_Procedencia=LP.ID
+		join Tipo_Annejado TA on C.ID_Annejado=TA.ID
+		join Sucursal S on S.ID=I.ID_Sucursal
+	where I.ID_Catalogo=isnull(@ID_Producto,ID_Catalogo) and I.ID_Sucursal=isnull(@ID_Sucursal,ID_Sucursal)
+END
+GO
+
+
+
+
+
+
+--------------- CRUD Procedencia ---------------
+/*
+-- Insertar lugar de procedencia
+CREATE PROCEDURE agregarLugarProcedencia (@Nombre_Pais varchar(20))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Lugar_Procedencia where Pais=@Nombre_Pais
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				insert into Lugar_Procedencia values (@Nombre_Pais)
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion del licor en la sucursal',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar lugar de procedencia
+CREATE PROCEDURE actualizarLicorSucursal (@ID_Producto int, @ID_Sucursal int, @Cantidad int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				update Inventario set Cantidad=@Cantidad where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion de la cantidad del licor',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar producto
+CREATE PROCEDURE eliminarLicorSucursal (@ID_Producto int, @ID_Sucursal int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				delete Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion licor en la sucursal',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar productos Sucursal
+CREATE PROCEDURE eliminarLicorSucursal (@ID_Producto int, @ID_Sucursal int)
+AS
+BEGIN
+	select Inventario where ID_Catalogo=isnull(@ID_Producto,ID_Catalogo) and ID_Sucursal=isnull(@ID_Sucursal,ID_Sucursal)
+END
+GO*/
