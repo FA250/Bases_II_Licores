@@ -58,15 +58,6 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.TextBox textbox_nombrePConsulta;
         
         /// <summary>
-        /// textbox_idPConsulta control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox textbox_idPConsulta;
-        
-        /// <summary>
         /// button_consultarPrecioProducto control.
         /// </summary>
         /// <remarks>
@@ -76,13 +67,31 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Button button_consultarPrecioProducto;
         
         /// <summary>
-        /// Label1 control.
+        /// label_precio control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Label1;
+        protected global::System.Web.UI.WebControls.Label label_precio;
+        
+        /// <summary>
+        /// label_precioConsultado control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_precioConsultado;
+        
+        /// <summary>
+        /// textbox_idPConsulta control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textbox_idPConsulta;
         
         /// <summary>
         /// label_actualizarPrecio control.
@@ -148,13 +157,13 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Label Label5;
         
         /// <summary>
-        /// Button2 control.
+        /// button_actualizarPrecio control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button2;
+        protected global::System.Web.UI.WebControls.Button button_actualizarPrecio;
         
         /// <summary>
         /// fileupload_imagenNuevoProducto control.
@@ -166,13 +175,31 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.FileUpload fileupload_imagenNuevoProducto;
         
         /// <summary>
-        /// dropdownlist_paisNuevoProducto control.
+        /// label_nombreSucursal control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList dropdownlist_paisNuevoProducto;
+        protected global::System.Web.UI.WebControls.Label label_nombreSucursal;
+        
+        /// <summary>
+        /// textbox_nombreSucursalTodos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textbox_nombreSucursalTodos;
+        
+        /// <summary>
+        /// table_consultas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Table table_consultas;
         
         /// <summary>
         /// label_productoMasVendido control.
@@ -328,15 +355,6 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Button button_consultarProductos;
         
         /// <summary>
-        /// Table1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Table Table1;
-        
-        /// <summary>
         /// Calendar1 control.
         /// </summary>
         /// <remarks>
@@ -382,6 +400,15 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Button button_fechaInicial;
         
         /// <summary>
+        /// label_nombreSucursalMasMenosVendidos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_nombreSucursalMasMenosVendidos;
+        
+        /// <summary>
         /// label_consultarProductorSucursal control.
         /// </summary>
         /// <remarks>
@@ -409,6 +436,15 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Label label_fechaFinal;
         
         /// <summary>
+        /// textbox_nombreSucursalMasMenosVendido control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textbox_nombreSucursalMasMenosVendido;
+        
+        /// <summary>
         /// label_idSucursal0 control.
         /// </summary>
         /// <remarks>
@@ -427,13 +463,13 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Button button_consultarMasVendidos;
         
         /// <summary>
-        /// dropdownlist_paisNuevoProducto0 control.
+        /// dropdownlist_paisNuevoProducto control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList dropdownlist_paisNuevoProducto0;
+        protected global::System.Web.UI.WebControls.DropDownList dropdownlist_paisNuevoProducto;
         
         /// <summary>
         /// button_consultaSinSalida control.

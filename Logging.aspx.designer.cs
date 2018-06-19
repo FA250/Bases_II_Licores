@@ -31,13 +31,13 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.RadioButtonList RadioButtonList1;
         
         /// <summary>
-        /// TextBox1 control.
+        /// textbox_identificacion control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TextBox1;
+        protected global::System.Web.UI.WebControls.TextBox textbox_identificacion;
         
         /// <summary>
         /// label_contrasena control.
@@ -58,13 +58,13 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Label Label1;
         
         /// <summary>
-        /// TextBox2 control.
+        /// textbox_contrasena control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TextBox2;
+        protected global::System.Web.UI.WebControls.TextBox textbox_contrasena;
         
         /// <summary>
         /// Button1 control.

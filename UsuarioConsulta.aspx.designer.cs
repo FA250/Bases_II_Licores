@@ -31,6 +31,15 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Label label_ingreseIDSucursal;
         
         /// <summary>
+        /// label_NombreProducto control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_NombreProducto;
+        
+        /// <summary>
         /// label_consultaHorario control.
         /// </summary>
         /// <remarks>
@@ -38,15 +47,6 @@ namespace LicoreraWeb {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label label_consultaHorario;
-        
-        /// <summary>
-        /// button_consultarHorario control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button button_consultarHorario;
         
         /// <summary>
         /// label_consultarProducto control.
@@ -58,13 +58,31 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Label label_consultarProducto;
         
         /// <summary>
-        /// label_ingreseNombreProducto control.
+        /// button_consultarHorario control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label label_ingreseNombreProducto;
+        protected global::System.Web.UI.WebControls.Button button_consultarHorario;
+        
+        /// <summary>
+        /// label_idProductoConsulta control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_idProductoConsulta;
+        
+        /// <summary>
+        /// button_consultarProducto control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button button_consultarProducto;
         
         /// <summary>
         /// textbox_nombreProducto control.
@@ -76,6 +94,15 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.TextBox textbox_nombreProducto;
         
         /// <summary>
+        /// textbox_idProductoConsulta control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textbox_idProductoConsulta;
+        
+        /// <summary>
         /// textbox_idSucursal control.
         /// </summary>
         /// <remarks>
@@ -83,6 +110,15 @@ namespace LicoreraWeb {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox textbox_idSucursal;
+        
+        /// <summary>
+        /// label_idSucursalActualConsultaProducto control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_idSucursalActualConsultaProducto;
         
         /// <summary>
         /// label_precio control.
@@ -101,6 +137,15 @@ namespace LicoreraWeb {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label label_precioConsultado;
+        
+        /// <summary>
+        /// textbox_idSucursalActual control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textbox_idSucursalActual;
         
         /// <summary>
         /// label_sucursales control.
@@ -146,15 +191,6 @@ namespace LicoreraWeb {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image image_fotoProducto;
-        
-        /// <summary>
-        /// button_consultarProducto control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button button_consultarProducto;
         
         /// <summary>
         /// button_volver control.

@@ -29,5 +29,106 @@ namespace LicoreraWeb
         {
             this.conn = (SqlConnection)Session["SQL"];
         }
+
+        protected void button_consultarProducto_Click(object sender, EventArgs e)
+        {
+            String nombreProducto = textbox_nombreProducto.Text;
+            String idSucursalActualString = textbox_idSucursalActual.Text;
+            String idProductoString = textbox_idProductoConsulta.Text;
+
+
+            
+            if (string.IsNullOrWhiteSpace(idSucursalActualString))
+            {
+                Response.Write("<script>alert('Ingrese solo uno de los dos campos') </script>");
+                return;
+            }
+
+            
+
+            // nombre nulo y id no nulo
+            if (string.IsNullOrWhiteSpace(nombreProducto) && !string.IsNullOrWhiteSpace(idProductoString) )
+            {
+
+                int idProducto = Int32.Parse(textbox_idProductoConsulta.Text);
+                int idSucursal = Int32.Parse(textbox_idSucursalActual.Text);
+
+                // Procedimiento almacenado
+                SqlCommand cmd = new SqlCommand("consultaProducto", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+
+                cmd.Parameters.Add(new SqlParameter("@ID_Sucursal", SqlDbType.Int) { Value = idSucursal });
+                cmd.Parameters.Add(new SqlParameter("@ID_producto", SqlDbType.Int) { Value = idProducto });
+                cmd.Parameters.Add(new SqlParameter("@Nombre_Producto", SqlDbType.VarChar,20) { Value = DBNull.Value });
+
+
+
+                String nombreConsultado = "";
+                int precioConsultado = 0;
+                // byte[] myImage = (byte[])reader["MyImageColumn"];
+                byte[] fotoConsultada = null;
+                String nombreSucursalConsultada  = "";
+                int distancia = 0;
+
+                String lineaConsulta = "";
+
+
+
+
+
+                dropdownlist_sucursales.Items.Clear();
+                ListItem item = new ListItem();
+                
+
+                // execute the command
+                using (SqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    // iterate through results, printing each to console
+                    while (rdr.Read())
+                    {
+                        nombreConsultado = rdr.GetString(0);
+                        int precio = (int) rdr.GetSqlMoney(1);
+                        fotoConsultada = (byte[]) rdr["Foto"];
+                        nombreSucursalConsultada = rdr.GetString(3);
+                        distancia = rdr.GetInt16(4);
+                        lineaConsulta = "Nombre : " + nombreConsultado + " Precio: " + precio + " Nombre Sucursal: " + nombreSucursalConsultada + " Distancia: " + distancia;
+
+                        // Se anaden los valores consultados a la interfaz
+                        this.label_precioConsultado.Text = precio.ToString();
+                        item.Text = lineaConsulta;
+                        this.dropdownlist_sucursales.Items.Add(item);
+
+                        string base64String = Convert.ToBase64String(fotoConsultada);
+                        this.image_fotoProducto.ImageUrl = String.Format("data:image/jpg;base64,{0}", base64String);
+
+
+
+                        //Console.WriteLine("Product: {0,-35} Total: {1,2}", rdr["ProductName"], rdr["Total"]);
+
+                    }
+
+                    
+                    
+                }
+
+
+
+            }
+            else if (string.IsNullOrWhiteSpace(idProductoString) && !string.IsNullOrWhiteSpace(nombreProducto) )
+            {
+                
+            }
+            else if( string.IsNullOrWhiteSpace(idProductoString) && string.IsNullOrWhiteSpace(nombreProducto))
+            {
+                Response.Write("<script>alert('Ingrese el id del producto o el nombre del producto') </script>");
+                return;
+            }
+            else {
+
+                Response.Write("<script>alert('Ingrese solo el id o solo el nombre del producto') </script>");
+                return;
+            }
+        }
     }
 }
