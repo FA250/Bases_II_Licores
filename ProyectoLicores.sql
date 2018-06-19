@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/19/2018 2:46:44 PM                         */
+/* Created on:     6/19/2018 3:58:52 PM                         */
 /*==============================================================*/
 
 
@@ -442,7 +442,7 @@ create table USUARIO (
    ID_TELEFONO          int                  null,
    ID_NIVEL             numeric(2)           null,
    ID_SUCURSAL          int                  null,
-   CONTRASENNA          varchar(10)          null,
+   CONTRASENNA          varchar(300)         null,
    FOTO                 varbinary(Max)       null,
    constraint PK_USUARIO primary key (CEDULA)
 )
