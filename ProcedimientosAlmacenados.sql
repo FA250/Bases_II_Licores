@@ -270,7 +270,7 @@ GO
 
 
 -- Consulta producto
-CREATE PROCEDURE consultaProducto (@ID_Sucursal int, @ID_producto int, @Nombre_Producto varchar(20))
+CREATE PROCEDURE consultaProductos (@ID_Sucursal int, @ID_producto int, @Nombre_Producto varchar(20))
 AS
 BEGIN
 	declare @ubicacionActual geometry
@@ -284,7 +284,7 @@ END
 GO
 
 -- Consulta horario
-CREATE PROCEDURE consultaHorario (@ID_Sucursal int)
+CREATE PROCEDURE consultaHorarioSucursal (@ID_Sucursal int)
 AS
 BEGIN
 	select H.Entrada, H.Salida, H.Dias
@@ -294,7 +294,7 @@ END
 GO
 
 -- Consulta Empleados
-CREATE PROCEDURE consultaEmpleados (@ID_Sucursal int)
+CREATE PROCEDURE consultaEmpleadosSucursal (@ID_Sucursal int)
 AS
 BEGIN
 	select U.Cedula, N.Nombre, N.Apellido1, N.Apellido2, T.Celular, T.Telefono--, U.Foto
@@ -667,7 +667,7 @@ GO
 CREATE PROCEDURE seleccionarLugarProcedencia (@ID_Lugar int, @Nombre_lugar varchar(25))
 AS
 BEGIN
-	select ID, Pais from LUGAR_PROCEDENCIA where ID=isnull(@ID_Lugar,ID) and Pais like isnull(@Nombre_lugar,Pais)
+	select ID, Pais from LUGAR_PROCEDENCIA where ID=isnull(@ID_Lugar,ID) and Pais like '%'+isnull(@Nombre_lugar,Pais)+'%'
 END
 GO
 
@@ -785,17 +785,14 @@ GO
 CREATE PROCEDURE seleccionarTipoAnnejado (@ID_Annejado int, @Nombre_Annejado varchar(25))
 AS
 BEGIN
-	select ID, Nombre, Descripcion from Tipo_Annejado where ID=isnull(@ID_Annejado,ID) and Nombre like isnull(@Nombre_Annejado,Nombre)
+	select ID, Nombre, Descripcion from Tipo_Annejado where ID=isnull(@ID_Annejado,ID) and Nombre like '%'+isnull(@Nombre_Annejado,Nombre)+'%'
 END
 GO
 
 
 
-
-
-
 --------------- Datos de tiendas, nombre, direccion, ubicacion, horario ---------------
-/*
+
 -- Insertar Sucursal
 CREATE PROCEDURE agregarSucursal (@Id_Horario int, @ID_Direccion int, @nombre varchar(20), @ubicacion varchar(20))
 AS
@@ -804,7 +801,7 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Sucursal where ID_Direccion=@ID_Direccion and nombre=@nombre and ubicacion=@ubicacion
+	select @existe=id from Sucursal where ID_Direccion=@ID_Direccion and nombre=@nombre and ubicacion.STEquals(geometry::STGeomFromText(@ubicacion, 0))=1
 
 	BEGIN TRY
 		BEGIN
@@ -814,7 +811,7 @@ BEGIN
 			end
 			else
 			begin
-				insert into Lugar_Procedencia values (@Nombre_Pais)
+				insert into SUCURSAL values (@Id_Horario,@ID_Direccion,@nombre,@ubicacion)
 				select 1
 			end
 
@@ -822,7 +819,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la insercion del lugar de procedencia',1,1)
+			raiserror('Ha ocurrido un problema durante la insercion de la sucursal',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -832,15 +829,15 @@ BEGIN
 END
 GO
 
--- Actualizar lugar de procedencia
-CREATE PROCEDURE actualizarLugarProcedencia (@ID_Lugar int, @Nombre_Pais varchar(20))
+-- Actualizar Sucursal
+CREATE PROCEDURE actualizarSucursal (@ID_Sucursal int, @Id_Horario int, @ID_Direccion int, @nombre varchar(20), @ubicacion varchar(20))
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Lugar_Procedencia where Pais=@Nombre_Pais
+	select @existe=id from Sucursal where id=@ID_Sucursal
 
 	BEGIN TRY
 		BEGIN
@@ -850,7 +847,8 @@ BEGIN
 			end
 			else
 			begin
-				update Lugar_Procedencia set Pais=@Nombre_Pais where ID=@ID_Lugar
+				update Sucursal set Id_Horario=isnull(@Id_Horario,ID_HORARIO), ID_Direccion=isnull(@ID_Direccion,ID_Direccion), nombre=isnull(@nombre,NOMBRE), ubicacion=isnull(geometry::STGeomFromText(@ubicacion, 0),@ubicacion)  
+				where ID=@ID_Sucursal
 				select 1
 			end
 
@@ -858,7 +856,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la actualizacion del lugar de procedencia',1,1)
+			raiserror('Ha ocurrido un problema durante la actualizacion de la sucursal',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -868,15 +866,15 @@ BEGIN
 END
 GO
 
--- Eliminar lugar de procedencia
-CREATE PROCEDURE eliminarLugarProcedencia (@ID_Procedencia int)
+-- Eliminar sucursal
+CREATE PROCEDURE eliminarSucursal (@ID_Sucursal int)
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Lugar_Procedencia where id=@ID_Procedencia
+	select @existe=id from Sucursal where id=@ID_Sucursal
 
 	BEGIN TRY
 		BEGIN
@@ -886,7 +884,7 @@ BEGIN
 			end
 			else
 			begin
-				delete Lugar_Procedencia where id=@ID_Procedencia
+				delete Sucursal where id=@ID_Sucursal
 				select 1
 			end
 
@@ -894,7 +892,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la eliminacion del lugar de procedencia',1,1)
+			raiserror('Ha ocurrido un problema durante la eliminacion de la sucursal',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -904,10 +902,134 @@ BEGIN
 END
 GO
 
--- Seleccionar Lugar Procedencia
-CREATE PROCEDURE seleccionarLugarProcedencia (@ID_Lugar int, @Nombre_lugar varchar(25))
+-- Seleccionar sucursal
+CREATE PROCEDURE seleccionarSucursal (@ID_Sucursal int, @Nombre_Sucursal varchar(25))
 AS
 BEGIN
-	select ID, Pais where ID=isnull(@ID_Lugar,ID) and Pais like isnull(@Nombre_lugar,Pais)
+	select S.ID, S.NOMBRE,H.ENTRADA as Hora_Entrada, H.SALIDA as Hora_Salida, H.DIAS, D.PAIS, D.PROVINCIA, D.CANTON, D.DETALLE
+	from SUCURSAL S join Horario H on S.ID_HORARIO=H.ID
+		join Direccion D on D.ID=S.ID_DIRECCION
+	where S.ID=isnull(@ID_Sucursal,S.ID) and S.Nombre like '%'+isnull(@Nombre_Sucursal,S.Nombre)+'%'
 END
-GO*/
+GO
+
+---- CRUD Horario
+
+-- Insertar Horario
+CREATE PROCEDURE agregarHorario (@Entrada time, @Salida time, @Dias varchar(16))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Horario where Entrada=@Entrada and Salida=@Salida and Dias=@Dias
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				insert into Horario values (@Entrada,@Salida,@Dias)
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion del horario',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar Horario
+CREATE PROCEDURE actualizarHorario (@ID_Horario int, @Entrada time, @Salida time, @Dias varchar(16))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from HORARIO where id=@ID_Horario
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				update HORARIO set Entrada=isnull(@Entrada,Entrada), Salida=isnull(@Salida,Salida), Dias=isnull(@Dias,Dias)
+				where ID=@ID_Horario
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del horario',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar sucursal
+CREATE PROCEDURE eliminarHorario (@ID_Horario int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Horario where id=@ID_Horario
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				delete Horario where id=@ID_Horario
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion del horario',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar sucursal
+CREATE PROCEDURE seleccionarHorario (@ID_Horario int)
+AS
+BEGIN
+	select ID,ENTRADA,SALIDA,DIAS
+	from Horario
+	where ID=isnull(@ID_Horario,ID)
+END
+GO
