@@ -5,10 +5,11 @@ Use Licores
 insert into Horario values(PARSE('7:00:00' AS time USING 'en-US'),PARSE('5:00:00' AS time USING 'en-US'),'L-V')
 
 -- Sucursal
-insert into Sucursal values (1,'Heredia','POINT (10 5)'),
-							(1,'San Jose','POINT (2 2)'),
-							(1,'Cartago','POINT (8 -10)'),
-							(1,'Limon','POINT (23 4)')
+insert into Sucursal values (1,null,'Heredia','POINT (10 5)'),
+							(1,null,'San Jose','POINT (2 2)'),
+							(1,null,'Cartago','POINT (8 -10)'),
+							(1,null,'Limon','POINT (23 4)')
+						
 
 -- Tipos Usuario
 insert into Nivel values (1,'Administrador','Administra los datos de la aplicación puede insertar'),
@@ -43,7 +44,7 @@ Insert into Catalogo values (1,5,'Merlot', 2018, 7000, null),
 							(1,4,'Sauvignon Blanc', 2018, 5500, null),
 							(2,2,'Riesling', 2016, 6200, null)
 
-
+							
 -- Inventario
 insert into inventario values (2,3,20),
 								(4,3,25),
@@ -55,7 +56,8 @@ insert into inventario values (2,3,20),
 								(3,1,6),
 								(2,1,14),
 								(6,4,29),
-								(4,4,41)				
+								(4,4,41)
+																		
 
 -- Metodo de pago
 insert into Metodo_Pago values ('Tarjeta'),
