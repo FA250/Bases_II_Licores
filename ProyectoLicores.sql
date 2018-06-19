@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/19/2018 3:58:52 PM                         */
+/* Created on:     6/19/2018 5:06:45 PM                         */
 /*==============================================================*/
 
 
@@ -299,7 +299,7 @@ go
 /* Table: COMBINACION_CATALOGO                                  */
 /*==============================================================*/
 create table COMBINACION_CATALOGO (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_CATALOGO          int                  null,
    ID_COMBINACION       int                  null,
    constraint PK_COMBINACION_CATALOGO primary key (ID)
@@ -311,8 +311,8 @@ go
 /*==============================================================*/
 create table DESCUENTO (
    ID                   int                  identity,
-   DESCUENTO            float                null,
-   MONTO_MENSUAL        money                null,
+   DESCUENTO            numeric(4,3)         null,
+   MONTO_MENSUAL        int                  null,
    ACTIVO               bit                  null,
    constraint PK_DESCUENTO primary key (ID)
 )
@@ -459,7 +459,7 @@ create table VENTA (
    ID_METODO_PAGO       int                  null,
    CANT_LICORES         int                  null,
    TOTAL_ITEMS          int                  null,
-   IMPUESTO_VENTA       float                null,
+   IMPUESTO_VENTA       numeric(4,3)         null,
    FECHA_COMPRA         datetime             null,
    IDENTIFICACION_CLIENTE int                  null,
    MONTO_TOTAL          money                null,

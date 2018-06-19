@@ -443,9 +443,13 @@ BEGIN
 	declare @existe int
 	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
 
+	declare @existe_ID_Catalogo int, @existe_ID_Sucursal int
+	select @existe_ID_Catalogo=id from CATALOGO where ID=@ID_Producto
+	select @existe_ID_Sucursal=id from SUCURSAL where ID=@ID_Sucursal
+
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<1) or (@existe is null)
+			if((Len(@existe)<1) or (@existe is null)) and ((Len(@existe_ID_Catalogo)>0) or (@existe_ID_Catalogo is not null)) and ((Len(@existe_ID_Sucursal)>0) or (@existe_ID_Sucursal is not null))
 			begin
 			insert into Inventario values (@ID_Producto,@ID_Sucursal,@Cantidad)
 				select 1			  
@@ -1373,3 +1377,127 @@ BEGIN
 	select ID, Producto, Descripcion from COMBINACION where ID=isnull(@ID_Combinacion,ID) and PRODUCTO like '%'+isnull(@Nombre_Producto,PRODUCTO)+'%'
 END
 GO
+
+
+--------------- CRUD Empleados ---------------
+/*
+-- Insertar empleado
+CREATE PROCEDURE agregarUsuario (@Nombre_Producto varchar(35), @Descripcion varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from COMBINACION where Upper(PRODUCTO)=Upper(@Nombre_Producto)
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<1) or (@existe is null)
+			begin
+			insert into COMBINACION values (@Nombre_Producto,@Descripcion)
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion de la combinacion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar combinacion 
+CREATE PROCEDURE actualizarCombinacion (@ID_Combinacion int, @Nombre_Producto varchar(35), @Descripcion varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from COMBINACION where ID=@ID_Combinacion
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			update COMBINACION set PRODUCTO=@Nombre_Producto, Descripcion=@Descripcion where ID=@ID_Combinacion
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion de la combinacion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar COMBINACION
+CREATE PROCEDURE eliminarCombinacion (@ID_Combinacion int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from COMBINACION where id=@ID_Combinacion
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			delete COMBINACION where id=@ID_Combinacion
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion de la combinacion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar Combinacion
+CREATE PROCEDURE seleccionarCombinacion (@ID_Combinacion int, @Nombre_Producto varchar(25))
+AS
+BEGIN
+	select ID, Producto, Descripcion from COMBINACION where ID=isnull(@ID_Combinacion,ID) and PRODUCTO like '%'+isnull(@Nombre_Producto,PRODUCTO)+'%'
+END
+
+
+*/
