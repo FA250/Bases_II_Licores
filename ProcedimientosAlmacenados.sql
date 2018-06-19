@@ -219,13 +219,13 @@ END
 GO
 
 -- Ventas por Tipo de pago, sucursal y fechas
-CREATE PROCEDURE ventasX_TipoPago_Sucursal_Fechas (@ID_Pago int, @Nombre varchar(15), @ID_sucursal int, @Nombre_sucursal varchar(20),@Fecha_ini datetime, @Fecha_Fin datetime)
+CREATE PROCEDURE ventasX_TipoPago_Sucursal_Fechas (@ID_Pago int, @ID_sucursal int, @Nombre_sucursal varchar(20),@Fecha_ini datetime, @Fecha_Fin datetime)
 AS
 BEGIN
 	select V.ID, V.Cant_licores, V.total_items, V.Impuesto_venta, V.Fecha_compra, V.Monto_Total, MP.Nombre
 	from Venta V join Metodo_Pago MP on V.ID_Metodo_Pago=MP.ID
 		join Sucursal S on V.ID_Sucursal=S.ID
-	where MP.ID=ISNULL(@ID_Pago,MP.ID) and MP.Nombre like '%'+isnull(@Nombre,MP.Nombre)+'%' and S.ID=isnull(@ID_sucursal, S.ID) and S.Nombre like '%'+isnull(@Nombre_sucursal, S.Nombre)+'%' and V.Fecha_Compra between isnull(@Fecha_ini,V.Fecha_Compra) and isnull(@Fecha_Fin,V.Fecha_Compra)
+	where MP.ID=ISNULL(@ID_Pago,MP.ID) and S.ID=isnull(@ID_sucursal, S.ID) and S.Nombre like '%'+isnull(@Nombre_sucursal, S.Nombre)+'%' and V.Fecha_Compra between isnull(@Fecha_ini,V.Fecha_Compra) and isnull(@Fecha_Fin,V.Fecha_Compra)
 END
 GO
 
@@ -276,7 +276,7 @@ BEGIN
 	declare @ubicacionActual geometry
 	Select @ubicacionActual=Ubicacion from Sucursal where ID=@ID_Sucursal
 
-	select C.ID, C.Nombre, C.Precio, C.Foto, S.Nombre, S.Ubicacion.STDistance(@ubicacionActual), I.Cantidad
+	select C.ID, C.Nombre, C.Precio, C.Foto, S.Nombre As Sucursal, S.Ubicacion.STDistance(@ubicacionActual), I.Cantidad
 	from Catalogo C join Inventario I on C.ID=I.ID_Catalogo
 			join Sucursal S on I.ID_Sucursal=S.ID
 	where C.ID=isnull(@ID_producto,C.ID) and C.Nombre like '%'+isnull(@Nombre_Producto,C.Nombre)+'%'
@@ -429,9 +429,6 @@ GO
 
 
 
-
-
-
 --------------- CRUD Licores sucursal ---------------
 
 -- Insertar licor en sucursal
@@ -546,7 +543,7 @@ GO
 CREATE PROCEDURE seleccionarLicorSucursal (@ID_Producto int, @ID_Sucursal int)
 AS
 BEGIN
-	select C.Nombre, C.AnnoCosecha, TA.Nombre as Annejado, LP.Pais as LugarProcedencia, I.Cantidad, S.Nombre as Sucursal
+	select C.Nombre, C.AnnoCosecha, TA.Nombre as Annejado, LP.Pais as LugarProcedencia, I.Cantidad, S.Nombre as Sucursal, C.Precio, C.Foto
 	from Inventario I join Catalogo C on I.ID_Catalogo=C.ID
 		join Lugar_Procedencia LP on C.ID_Procedencia=LP.ID
 		join Tipo_Annejado TA on C.ID_Annejado=TA.ID
@@ -556,14 +553,10 @@ END
 GO
 
 
-
-
-
-
 --------------- CRUD Procedencia ---------------
-/*
+
 -- Insertar lugar de procedencia
-CREATE PROCEDURE agregarLugarProcedencia (@Nombre_Pais varchar(20))
+CREATE PROCEDURE agregarLugarProcedencia (@Nombre_Pais varchar(25))
 AS
 BEGIN
 	BEGIN TRANSACTION;
@@ -588,7 +581,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la insercion del licor en la sucursal',1,1)
+			raiserror('Ha ocurrido un problema durante la insercion del lugar de procedencia',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -599,14 +592,14 @@ END
 GO
 
 -- Actualizar lugar de procedencia
-CREATE PROCEDURE actualizarLicorSucursal (@ID_Producto int, @ID_Sucursal int, @Cantidad int)
+CREATE PROCEDURE actualizarLugarProcedencia (@ID_Lugar int, @Nombre_Pais varchar(25))
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+	select @existe=id from Lugar_Procedencia where ID=@ID_Lugar
 
 	BEGIN TRY
 		BEGIN
@@ -616,7 +609,7 @@ BEGIN
 			end
 			else
 			begin
-				update Inventario set Cantidad=@Cantidad where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				update Lugar_Procedencia set Pais=@Nombre_Pais where ID=@ID_Lugar
 				select 1
 			end
 
@@ -624,7 +617,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la actualizacion de la cantidad del licor',1,1)
+			raiserror('Ha ocurrido un problema durante la actualizacion del lugar de procedencia',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -634,15 +627,15 @@ BEGIN
 END
 GO
 
--- Eliminar producto
-CREATE PROCEDURE eliminarLicorSucursal (@ID_Producto int, @ID_Sucursal int)
+-- Eliminar lugar de procedencia
+CREATE PROCEDURE eliminarLugarProcedencia (@ID_Procedencia int)
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+	select @existe=id from Lugar_Procedencia where id=@ID_Procedencia
 
 	BEGIN TRY
 		BEGIN
@@ -652,7 +645,7 @@ BEGIN
 			end
 			else
 			begin
-				delete Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				delete Lugar_Procedencia where id=@ID_Procedencia
 				select 1
 			end
 
@@ -660,7 +653,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la eliminacion licor en la sucursal',1,1)
+			raiserror('Ha ocurrido un problema durante la eliminacion del lugar de procedencia',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -670,10 +663,251 @@ BEGIN
 END
 GO
 
--- Seleccionar productos Sucursal
-CREATE PROCEDURE eliminarLicorSucursal (@ID_Producto int, @ID_Sucursal int)
+-- Seleccionar Lugar Procedencia
+CREATE PROCEDURE seleccionarLugarProcedencia (@ID_Lugar int, @Nombre_lugar varchar(25))
 AS
 BEGIN
-	select Inventario where ID_Catalogo=isnull(@ID_Producto,ID_Catalogo) and ID_Sucursal=isnull(@ID_Sucursal,ID_Sucursal)
+	select ID, Pais from LUGAR_PROCEDENCIA where ID=isnull(@ID_Lugar,ID) and Pais like isnull(@Nombre_lugar,Pais)
+END
+GO
+
+--------------- CRUD Tipo annejado ---------------
+
+-- Insertar tipo annejado
+CREATE PROCEDURE agregarTipoAnnejado (@Nombre_Annejado varchar(20), @Descripcion varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from TIPO_ANNEJADO where Nombre=@Nombre_Annejado
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				insert into TIPO_ANNEJADO values (@Nombre_Annejado,@Descripcion)
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion del tipo de annejado',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar tipo annejado 
+CREATE PROCEDURE actualizarTipoAnnejado (@ID_Annejado int, @Nombre_Annejado varchar(20), @Descripcion varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from TIPO_ANNEJADO where ID=@ID_Annejado
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				update TIPO_ANNEJADO set Nombre=@Nombre_Annejado, Descripcion=@Descripcion where ID=@ID_Annejado
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del tipo de annejado',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar tipo de annejado
+CREATE PROCEDURE eliminarTipoAnnejado (@ID_Annejado int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from TIPO_ANNEJADO where id=@ID_Annejado
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				delete TIPO_ANNEJADO where id=@ID_Annejado
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion del tipo de annejado',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar Tipo de annejado
+CREATE PROCEDURE seleccionarTipoAnnejado (@ID_Annejado int, @Nombre_Annejado varchar(25))
+AS
+BEGIN
+	select ID, Nombre, Descripcion from Tipo_Annejado where ID=isnull(@ID_Annejado,ID) and Nombre like isnull(@Nombre_Annejado,Nombre)
+END
+GO
+
+
+
+
+
+
+--------------- Datos de tiendas, nombre, direccion, ubicacion, horario ---------------
+/*
+-- Insertar Sucursal
+CREATE PROCEDURE agregarSucursal (@Id_Horario int, @ID_Direccion int, @nombre varchar(20), @ubicacion varchar(20))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Sucursal where ID_Direccion=@ID_Direccion and nombre=@nombre and ubicacion=@ubicacion
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				insert into Lugar_Procedencia values (@Nombre_Pais)
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion del lugar de procedencia',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar lugar de procedencia
+CREATE PROCEDURE actualizarLugarProcedencia (@ID_Lugar int, @Nombre_Pais varchar(20))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Lugar_Procedencia where Pais=@Nombre_Pais
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				update Lugar_Procedencia set Pais=@Nombre_Pais where ID=@ID_Lugar
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del lugar de procedencia',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar lugar de procedencia
+CREATE PROCEDURE eliminarLugarProcedencia (@ID_Procedencia int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Lugar_Procedencia where id=@ID_Procedencia
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<0) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				delete Lugar_Procedencia where id=@ID_Procedencia
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion del lugar de procedencia',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar Lugar Procedencia
+CREATE PROCEDURE seleccionarLugarProcedencia (@ID_Lugar int, @Nombre_lugar varchar(25))
+AS
+BEGIN
+	select ID, Pais where ID=isnull(@ID_Lugar,ID) and Pais like isnull(@Nombre_lugar,Pais)
 END
 GO*/
