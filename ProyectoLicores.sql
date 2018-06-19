@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/19/2018 12:53:52 PM                        */
+/* Created on:     6/19/2018 2:46:44 PM                         */
 /*==============================================================*/
 
 
@@ -402,7 +402,7 @@ go
 /* Table: SUCURSAL                                              */
 /*==============================================================*/
 create table SUCURSAL (
-   ID                   int                  not null,
+   ID                   int                  identity,
    ID_HORARIO           int                  null,
    ID_DIRECCION         int                  null,
    NOMBRE               varchar(20)          null,
