@@ -6,44 +6,67 @@ BEGIN
 END
 GO
 
+-- Seleccionar tipos de usuario
+CREATE PROCEDURE obtenerTiposUsuario 
+AS
+BEGIN
+	select ID, nombre from Nivel
+END
+GO
 
 -- Registrar usuario nuevo
 CREATE PROCEDURE registrarUsuario (@Cedula int, @Contrasenna varchar(10), @Foto varbinary(max), @Nombre varchar(20), @Apellido1 varchar(20), @Apellido2 varchar(20), @Celular int, @Telefono int, @ID_Nivel int, @ID_Sucursal int)
 AS
 BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
 	declare @existe int
 	set @existe=null
 	select @existe=cedula from usuario where cedula=@Cedula
 
-	if (Len(@existe)<1) or (@existe is null)
-	begin
-		declare @id_nombre int
-		set @id_nombre=NULL
-		select @id_nombre=id from Nombre where NOMBRE=@Nombre and Apellido1=@Apellido1 and APELLIDO2=@Apellido2
+	BEGIN TRY
+		BEGIN
+			if (Len(@existe)<1) or (@existe is null)
+			begin
+				declare @id_nombre int
+				set @id_nombre=NULL
+				select @id_nombre=id from Nombre where NOMBRE=@Nombre and Apellido1=@Apellido1 and APELLIDO2=@Apellido2
 
-		declare @id_telefono int
-		set @id_telefono=NULL
-		select @id_telefono=id from TELEFONO where TELEFONO=@Telefono and CELULAR=@Celular
+				declare @id_telefono int
+				set @id_telefono=NULL
+				select @id_telefono=id from TELEFONO where TELEFONO=@Telefono and CELULAR=@Celular
 	
-		if (@id_nombre is NULL) or (Len(@id_nombre)<1)
-		begin
-			insert into nombre values(@Cedula,@Nombre,@Apellido1,@Apellido2)
-			set @id_nombre=@Cedula
-		end
+				if (@id_nombre is NULL) or (Len(@id_nombre)<1)
+				begin
+					insert into nombre values(@Cedula,@Nombre,@Apellido1,@Apellido2)
+					set @id_nombre=@Cedula
+				end
 	
-		if (@id_telefono is NULL) or (Len(@id_telefono)<1)
-		begin
-			insert into TELEFONO values (@Cedula,@Celular,@Telefono)
-			set @id_telefono=@cedula
-		end
+				if (@id_telefono is NULL) or (Len(@id_telefono)<1)
+				begin
+					insert into TELEFONO values (@Cedula,@Celular,@Telefono)
+					set @id_telefono=@cedula
+				end
 
-		Insert into Usuario values(@cedula, @id_nombre, @id_telefono, @id_nivel,@ID_Sucursal,@Contrasenna,@Foto)
-		select 1
-	end
-	else 
-	begin
-		select 0
-	end
+				Insert into Usuario values(@cedula, @id_nombre, @id_telefono, @id_nivel,@ID_Sucursal,@Contrasenna,@Foto)
+				select 1
+			end
+			else 
+			begin
+				select 0
+			end
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante el registro del usuario',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
 END
 GO
 
@@ -72,19 +95,37 @@ GO
 CREATE PROCEDURE actualizarPrecio (@id int, @precio money)
 AS
 BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
 	declare @existe int
 	set @existe=null
 	select @existe=count(id) from catalogo where id=@id
 
-	if(Len(@existe)<1) or (@existe is null)
-	begin
-	  select 0
-	end
-	else
-	begin
-		update Catalogo set precio=@precio where id=@id
-		select 1
-	end
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<1) or (@existe is null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				update Catalogo set precio=@precio where id=@id
+				select 1
+			end
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del catalogo',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN
+	
+	
 END
 GO
 
@@ -92,7 +133,35 @@ GO
 CREATE PROCEDURE insertarProducto (@id_annejado int, @ID_procedencia int, @nombre varchar(20), @anno_cosecha numeric(4), @precio money, @foto varbinary(max))
 AS
 BEGIN
-	insert into catalogo values (@id_annejado, @ID_procedencia, @nombre, @anno_cosecha, @precio, @foto)
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from catalogo where id_annejado=@id_annejado and ID_procedencia=@ID_procedencia and nombre=@nombre and anno_cosecha=@anno_cosecha	
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			  select 0
+			end
+			else
+			begin
+				insert into catalogo values (@id_annejado, @ID_procedencia, @nombre, @anno_cosecha, @precio, @foto)
+				select 1
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
 END
 GO
 
@@ -154,65 +223,6 @@ BEGIN
 END
 GO
 
-/*
--------------------------------------------------------------------
--------------------------------------------------------------------
---Consultar producto por sucursal
-CREATE PROCEDURE productosSucursal (@ID_sucursal int)
-AS
-BEGIN
-	select  C.ID, C.Nombre, C.AnnoCosecha, C.Precio, C.Foto
-	from inventario I join catalogo C on I.ID_Catalogo=C.ID
-	where I.ID_Sucursal=isnull(@ID_sucursal, I.ID_Sucursal)
-END
-GO
-
-
---Consultar ventas por sucursal
-CREATE PROCEDURE ventasSucursal (@ID_sucursal int, @Nombre_sucursal varchar(20),)
-AS
-BEGIN
-	select ID, Cant_licores, total_items, Impuesto_venta, Fecha_compra, Monto_Total   
-	from Venta V join Sucursal S on V.ID_Sucursal=S.ID
-	where ID_Sucursal=isnull(@ID_sucursal, ID_Sucursal) and S.Nombre like '%'+isnull(@Nombre_sucursal, S.Nombre)+'%'
-END
-GO
-
--- Consultas por licores
-CREATE PROCEDURE ventasLicores (@ID_Licor int, @Nombre_Licor varchar(20))
-AS
-BEGIN
-	select V.ID, V.Cant_licores, V.total_items, V.Impuesto_venta, V.Fecha_compra, V.Monto_Total, CV.Cantidad, CV.Subtotal   
-	from Venta V join Catalogo_Venta CV on V.ID=CV.ID_Venta
-		join Catalogo C on CV.ID_Catalogo=C.ID
-	where C.ID=isnull(@ID_Licor,C.ID) and C.Nombre like '%'+isnull(@Nombre_Licor,C.Nombre)+'%'
-	group by V.ID, V.Cant_licores, V.total_items, V.Impuesto_venta, V.Fecha_compra, V.Monto_Total,CV.Cantidad,CV.Subtotal   
-END 
-GO
-
---Consultar ventas por fecha
-CREATE PROCEDURE ventasFecha (@Fecha_ini datetime, @Fecha_Fin datetime)
-AS
-BEGIN
-	select ID, Cant_licores, total_items, Impuesto_venta, Fecha_compra, Monto_Total   
-	from Venta
-	where and V.Fecha_Compra between isnull(@Fecha_ini,V.Fecha_Compra) and isnull(@Fecha_Fin,V.Fecha_Compra)
-END
-GO
-
---Consultar ventas por tipo de pago
-CREATE PROCEDURE ventasTipoPago (@ID_Pago int, @Nombre varchar(15))
-AS
-BEGIN
-	select V.ID, V.Cant_licores, V.total_items, V.Impuesto_venta, V.Fecha_compra, V.Monto_Total, MP.Nombre
-	from Venta V join Metodo_Pago MP on V.ID_Metodo_Pago=MP.ID
-	where MP.ID=ISNULL(@ID_Pago,MP.ID) and MP.Nombre like '%'+isnull(@Nombre,MP.Nombre)+'%'
-END
-GO
--------------------------------------------------------------------
--------------------------------------------------------------------
-*/
-
 
 ----------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
@@ -269,26 +279,55 @@ create table Temp_IDs_Catalogo_Venta(
 	primary key (ID))
 go
 
+-- Obtener tipos de pago
+CREATE PROCEDURE obtenerTiposPago 
+AS
+BEGIN
+	select ID, Nombre from Metodo_Pago
+END
+GO
+
 -- Guarda los licores comprados previo a la creacion de la factura
 CREATE PROCEDURE registrarCatalogo_Venta (@Identificacion_Cliente int, @ID_Catalogo int, @Cantidad int, @Subtotal money)
 AS
 BEGIN
-	Insert into Catalogo_Venta (ID_Catalogo,Cantidad,Subtotal) values (@ID_Catalogo,@Cantidad,@Subtotal)
-	Insert into Temp_IDs_Catalogo_Venta values (scope_identity(),@Identificacion_Cliente)
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	BEGIN TRY
+		BEGIN
+			Insert into Catalogo_Venta (ID_Catalogo,Cantidad,Subtotal) values (@ID_Catalogo,@Cantidad,@Subtotal)
+			Insert into Temp_IDs_Catalogo_Venta values (scope_identity(),@Identificacion_Cliente)
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante el registro de los productos para la factura',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
 END
 GO
 
 -- Realiza la facturacion
 CREATE PROCEDURE facturar (@ID_Usuario int, @ID_Sucursal int, @Cantidad_Licores int, @Total_Items int, @Monto_Total money, @Identificacion_Cliente int, @ID_Metodo_Pago int)
 AS
-BEGIN
+Begin
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
 	declare @acumulado int	
 	select @acumulado=sum(Monto_Total) from Venta where datepart(month,Fecha_Compra)=datepart(month,getdate())
-
 	declare @id_descuento int, @descuento float
 	select @id_descuento=ID, @descuento=descuento from Descuento where monto_mensual <= @acumulado order by monto_mensual desc
 
-	Insert into Venta (ID_Usuario,ID_Sucursal,ID_descuento,ID_Metodo_Pago,Cant_Licores,Total_Items,Impuesto_Venta,Fecha_Compra,Identificacion_Cliente,Monto_Total)
+	BEGIN TRY
+		BEGIN
+		--Inserta factura
+			Insert into Venta (ID_Usuario,ID_Sucursal,ID_descuento,ID_Metodo_Pago,Cant_Licores,Total_Items,Impuesto_Venta,Fecha_Compra,Identificacion_Cliente,Monto_Total)
 			   values (@ID_Usuario,@ID_Sucursal,@id_descuento,@ID_Metodo_Pago,@Cantidad_Licores,@Total_Items,
 						case 
 							when @ID_Metodo_Pago = 1 then 0.10
@@ -296,28 +335,39 @@ BEGIN
 						end,							
 						getdate(),@Identificacion_Cliente,@Monto_Total)
 
-	declare @ID_Venta int
-	set @ID_Venta=SCOPE_IDENTITY()
+			--Recupera el id de la ultima insercion de las ventas
+			declare @ID_Venta int
+			set @ID_Venta=SCOPE_IDENTITY()
+			declare @salir int
+			set @salir=0	
+			declare @ID_CV int
 
-	declare @salir int
-	set @salir=0
-	
-	declare @ID_CV int
-
-	While @salir=0
-	begin
+			--Relaciona los productos comprados en la tabla Catalogo_venta con la factura (tabla Venta) insertada
+			While @salir=0
+			begin
 		
-		select top (1) @ID_CV=ID_Catalogo_Venta from Temp_IDs_Catalogo_Venta where Identificacion_Cliente=@Identificacion_Cliente order by ID_Catalogo_Venta desc
+				select top (1) @ID_CV=ID_Catalogo_Venta from Temp_IDs_Catalogo_Venta where Identificacion_Cliente=@Identificacion_Cliente order by ID_Catalogo_Venta desc
 
-		if (Len(@ID_CV)<1) or (@ID_CV is null)
-		begin
-			update Catalogo_Venta set ID_Venta=@ID_Venta where ID=@ID_CV
-			delete Temp_IDs_Catalogo_Venta where ID_Catalogo_Venta=@ID_CV
-		end
-		else 
-		begin
-			set @salir=1
-		end
-	end
+				if (Len(@ID_CV)<1) or (@ID_CV is null)
+				begin
+					update Catalogo_Venta set ID_Venta=@ID_Venta where ID=@ID_CV
+					delete Temp_IDs_Catalogo_Venta where ID_Catalogo_Venta=@ID_CV
+				end
+				else 
+				begin
+					--Sale cuando ya no hay mas productos que relacionar con la factura
+					set @salir=1
+				end
+			end
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante el registro de la factura',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+	COMMIT TRANSACTION
+	RETURN	
 END
 GO
