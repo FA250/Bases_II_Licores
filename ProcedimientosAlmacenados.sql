@@ -441,7 +441,7 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+	select @existe=id from Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
 
 	declare @existe_ID_Catalogo int, @existe_ID_Sucursal int
 	select @existe_ID_Catalogo=id from CATALOGO where ID=@ID_Producto
@@ -481,7 +481,7 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+	select @existe=id from Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
 
 	BEGIN TRY
 		BEGIN
@@ -517,7 +517,7 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Invetario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+	select @existe=id from Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
 
 	BEGIN TRY
 		BEGIN
@@ -1380,60 +1380,27 @@ GO
 
 
 --------------- CRUD Empleados ---------------
-/*
+
 -- Insertar empleado
-CREATE PROCEDURE agregarUsuario (@Nombre_Producto varchar(35), @Descripcion varchar(200))
+-- Procedimiento registrarUsuario (es el segundo de este archivo)
+/*
+-- Actualizar empleado 
+CREATE PROCEDURE actualizarEmpleado (@Cedula int, @Contrasenna varchar(10), @Foto varbinary(max), @Nombre varchar(20), @Apellido1 varchar(20), @Apellido2 varchar(20), @Celular int, @Telefono int, @ID_Nivel int, @ID_Sucursal int)
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from COMBINACION where Upper(PRODUCTO)=Upper(@Nombre_Producto)
-
-	BEGIN TRY
-		BEGIN
-			if(Len(@existe)<1) or (@existe is null)
-			begin
-			insert into COMBINACION values (@Nombre_Producto,@Descripcion)
-				select 1
-			  
-			end
-			else
-			begin
-				select 0
-			end
-
-		END
-	END TRY
-	BEGIN CATCH
-		BEGIN
-			raiserror('Ha ocurrido un problema durante la insercion de la combinacion',1,1)
-			ROLLBACK TRANSACTION BeforeInsert;
-		END
-	END CATCH
-
-	COMMIT TRANSACTION
-	RETURN	
-END
-GO
-
--- Actualizar combinacion 
-CREATE PROCEDURE actualizarCombinacion (@ID_Combinacion int, @Nombre_Producto varchar(35), @Descripcion varchar(200))
-AS
-BEGIN
-	BEGIN TRANSACTION;
-	SAVE TRANSACTION BeforeInsert;
-
-	declare @existe int
-	select @existe=id from COMBINACION where ID=@ID_Combinacion
+	select @existe=id from Usuario where Cedula=@Cedula
 
 	BEGIN TRY
 		BEGIN
 			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			update COMBINACION set PRODUCTO=@Nombre_Producto, Descripcion=@Descripcion where ID=@ID_Combinacion
-				select 1
+			update Usuario set Contrasenna=isnull(@Contrasenna,Contrasenna), Foto=isnull(@Foto,Foto),  ID_Nivel=isnull(@ID_Nivel,ID_Nivel), ID_Sucursal=isnull(@ID_Sucursal,ID_Sucursal) where Cedula=@Cedula
+			update Nombre set Nombre=@Nombre, Apell
+				select 
 			  
 			end
 			else
@@ -1500,4 +1467,4 @@ BEGIN
 END
 
 
-*/
+--*/
