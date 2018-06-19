@@ -107,14 +107,14 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<1) or (@existe is null)
-			begin
-			  select 0
-			end
-			else
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
 				update Catalogo set precio=@precio where id=@id
-				select 1
+				select 1			  
+			end
+			else				
+			begin
+				select 0
 			end
 		END
 	END TRY
@@ -140,18 +140,19 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from catalogo where id_annejado=@id_annejado and ID_procedencia=@ID_procedencia and nombre=@nombre and annocosecha=@anno_cosecha	
+	select @existe=id from catalogo where id_annejado=@id_annejado and ID_procedencia=@ID_procedencia and Upper(nombre)=Upper(@nombre) and annocosecha=@anno_cosecha	
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)>0) or (@existe is not null)
-			begin
-			  select 0
-			end
-			else
+			if(Len(@existe)<1) or (@existe is null)
 			begin
 				insert into catalogo values (@id_annejado, @ID_procedencia, @nombre, @anno_cosecha, @precio, @foto)
 				select 1
+			  
+			end
+			else
+			begin
+				select 0
 			end
 
 		END
@@ -180,14 +181,15 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)<1) or (@existe is null)
 			begin
-			  select 0
+			  update catalogo set foto=@foto
+				select 1
+			  
 			end
 			else
 			begin
-				update catalogo set foto=@foto
-				select 1
+				select 0
 			end
 
 		END
@@ -443,14 +445,14 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)>0) or (@existe is not null)
+			if(Len(@existe)<1) or (@existe is null)
 			begin
-			  select 0
+			insert into Inventario values (@ID_Producto,@ID_Sucursal,@Cantidad)
+				select 1			  
 			end
 			else
 			begin
-				insert into Inventario values (@ID_Producto,@ID_Sucursal,@Cantidad)
-				select 1
+				select 0
 			end
 
 		END
@@ -479,14 +481,14 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+				update Inventario set Cantidad=@Cantidad where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				select 1			  
 			end
 			else
 			begin
-				update Inventario set Cantidad=@Cantidad where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
-				select 1
+				select 0
 			end
 
 		END
@@ -515,14 +517,14 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			  delete Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
+				select 1
 			end
 			else
 			begin
-				delete Inventario where ID_Catalogo=@ID_Producto and ID_Sucursal=@ID_Sucursal
-				select 1
+				select 0				
 			end
 
 		END
@@ -563,18 +565,18 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Lugar_Procedencia where Pais=@Nombre_Pais
+	select @existe=id from Lugar_Procedencia where Upper(Pais)=Upper(@Nombre_Pais)
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)>0) or (@existe is not null)
+			if(Len(@existe)<1) or (@existe is null)
 			begin
-			  select 0
+				insert into Lugar_Procedencia values (@Nombre_Pais)
+				select 1			  
 			end
 			else
 			begin
-				insert into Lugar_Procedencia values (@Nombre_Pais)
-				select 1
+				select 0
 			end
 
 		END
@@ -603,14 +605,15 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			update Lugar_Procedencia set Pais=@Nombre_Pais where ID=@ID_Lugar
+				select 1
+			  
 			end
 			else
 			begin
-				update Lugar_Procedencia set Pais=@Nombre_Pais where ID=@ID_Lugar
-				select 1
+				select 0
 			end
 
 		END
@@ -639,14 +642,15 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			delete Lugar_Procedencia where id=@ID_Procedencia
+				select 1
+			  
 			end
 			else
 			begin
-				delete Lugar_Procedencia where id=@ID_Procedencia
-				select 1
+				select 0
 			end
 
 		END
@@ -681,18 +685,19 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from TIPO_ANNEJADO where Nombre=@Nombre_Annejado
+	select @existe=id from TIPO_ANNEJADO where Upper(Nombre)=Upper(@Nombre_Annejado)
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)>0) or (@existe is not null)
+			if(Len(@existe)<1) or (@existe is null)
 			begin
-			  select 0
+			insert into TIPO_ANNEJADO values (@Nombre_Annejado,@Descripcion)
+				select 1
+			  
 			end
 			else
 			begin
-				insert into TIPO_ANNEJADO values (@Nombre_Annejado,@Descripcion)
-				select 1
+				select 0
 			end
 
 		END
@@ -721,14 +726,15 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			update TIPO_ANNEJADO set Nombre=@Nombre_Annejado, Descripcion=@Descripcion where ID=@ID_Annejado
+				select 1
+			  
 			end
 			else
 			begin
-				update TIPO_ANNEJADO set Nombre=@Nombre_Annejado, Descripcion=@Descripcion where ID=@ID_Annejado
-				select 1
+				select 0
 			end
 
 		END
@@ -757,14 +763,15 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			delete TIPO_ANNEJADO where id=@ID_Annejado
+				select 1
+			  
 			end
 			else
 			begin
-				delete TIPO_ANNEJADO where id=@ID_Annejado
-				select 1
+				select 0
 			end
 
 		END
@@ -801,18 +808,19 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Sucursal where ID_Direccion=@ID_Direccion and nombre=@nombre and ubicacion.STEquals(geometry::STGeomFromText(@ubicacion, 0))=1
+	select @existe=id from Sucursal where ID_Direccion=@ID_Direccion and Upper(nombre)=Upper(@nombre) and ubicacion.STEquals(geometry::STGeomFromText(@ubicacion, 0))=1
 
 	BEGIN TRY
 		BEGIN
 			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			insert into SUCURSAL values (@Id_Horario,@ID_Direccion,@nombre,@ubicacion)
+				select 1
+			  
 			end
 			else
 			begin
-				insert into SUCURSAL values (@Id_Horario,@ID_Direccion,@nombre,@ubicacion)
-				select 1
+				select 0
 			end
 
 		END
@@ -841,15 +849,16 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			update Sucursal set Id_Horario=isnull(@Id_Horario,ID_HORARIO), ID_Direccion=isnull(@ID_Direccion,ID_Direccion), nombre=isnull(@nombre,NOMBRE), ubicacion=isnull(geometry::STGeomFromText(@ubicacion, 0),@ubicacion)  
+				where ID=@ID_Sucursal
+				select 1
+			  
 			end
 			else
 			begin
-				update Sucursal set Id_Horario=isnull(@Id_Horario,ID_HORARIO), ID_Direccion=isnull(@ID_Direccion,ID_Direccion), nombre=isnull(@nombre,NOMBRE), ubicacion=isnull(geometry::STGeomFromText(@ubicacion, 0),@ubicacion)  
-				where ID=@ID_Sucursal
-				select 1
+				select 0
 			end
 
 		END
@@ -878,14 +887,15 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			delete Sucursal where id=@ID_Sucursal
+				select 1
+			  
 			end
 			else
 			begin
-				delete Sucursal where id=@ID_Sucursal
-				select 1
+				select 0
 			end
 
 		END
@@ -923,18 +933,19 @@ BEGIN
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Horario where Entrada=@Entrada and Salida=@Salida and Dias=@Dias
+	select @existe=id from Horario where Entrada=@Entrada and Salida=@Salida and Upper(Dias)=Upper(@Dias)
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)>0) or (@existe is not null)
+			if(Len(@existe)<1) or (@existe is null)
 			begin
-			  select 0
+			insert into Horario values (@Entrada,@Salida,@Dias)
+				select 1
+			  
 			end
 			else
 			begin
-				insert into Horario values (@Entrada,@Salida,@Dias)
-				select 1
+				select 0
 			end
 
 		END
@@ -963,15 +974,16 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			  select 0
+			update HORARIO set Entrada=isnull(@Entrada,Entrada), Salida=isnull(@Salida,Salida), Dias=isnull(@Dias,Dias)
+				where ID=@ID_Horario
+				select 1
+			  
 			end
 			else
 			begin
-				update HORARIO set Entrada=isnull(@Entrada,Entrada), Salida=isnull(@Salida,Salida), Dias=isnull(@Dias,Dias)
-				where ID=@ID_Horario
-				select 1
+				select 0
 			end
 
 		END
@@ -988,7 +1000,7 @@ BEGIN
 END
 GO
 
--- Eliminar sucursal
+-- Eliminar horario
 CREATE PROCEDURE eliminarHorario (@ID_Horario int)
 AS
 BEGIN
@@ -1000,14 +1012,15 @@ BEGIN
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)<0) or (@existe is null)
-			begin
-			  select 0
-			end
-			else
+			if(Len(@existe)>0) or (@existe is not null)
 			begin
 				delete Horario where id=@ID_Horario
 				select 1
+			  
+			end
+			else
+			begin
+				select 0
 			end
 
 		END
@@ -1024,12 +1037,339 @@ BEGIN
 END
 GO
 
--- Seleccionar sucursal
+-- Seleccionar horario
 CREATE PROCEDURE seleccionarHorario (@ID_Horario int)
 AS
 BEGIN
 	select ID,ENTRADA,SALIDA,DIAS
 	from Horario
 	where ID=isnull(@ID_Horario,ID)
+END
+GO
+
+
+
+---- CRUD Direccion
+
+-- Insertar Direccion
+CREATE PROCEDURE agregarDireccion (@Pais varchar(25), @Provincia varchar(25), @Canton varchar(25), @Detalle varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Direccion where Upper(Pais)=Upper(@Pais) and Upper(Provincia)=Upper(@Provincia) and Upper(Canton)=Upper(@Canton) and Upper(Detalle)=Upper(@Detalle)
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<1) or (@existe is null)
+			begin
+			  insert into Direccion values (@Pais,@Provincia,@Canton,@Detalle)
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion de la direccion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar Direccion
+CREATE PROCEDURE actualizarDireccion(@ID_Direccion int, @Pais varchar(25), @Provincia varchar(25), @Canton varchar(25), @Detalle varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from DIRECCION where id=@ID_Direccion
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			update DIRECCION set Pais=isnull(@Pais,Pais), Provincia=isnull(@Provincia,Provincia), Canton=isnull(@Canton,Canton), Detalle=isnull(@Detalle,Detalle)
+				where ID=@ID_Direccion
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion de la direccion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar Direccion
+CREATE PROCEDURE eliminarDireccion (@ID_Direccion int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Direccion where id=@ID_Direccion
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+				delete Direccion where id=@ID_Direccion
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion de la direccion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar Direccion
+CREATE PROCEDURE seleccionarDireccion (@ID_Direccion int)
+AS
+BEGIN
+	select ID,Pais,PROVINCIA,CANTON,DETALLE
+	from Direccion
+	where ID=isnull(@ID_Direccion,ID)
+END
+GO
+
+
+
+-- Actualizacion año licores (el resto del crud se realiza junto con el de productos)
+CREATE PROCEDURE actualizarAnnoLicores (@ID_Catalogo int, @Anno numeric(4))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from CATALOGO where id=@ID_Catalogo
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+				update CATALOGO set ANNOCOSECHA=@Anno
+				where ID=@ID_Catalogo
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del anno del licor',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+
+-- Actualizacion precio (el resto del crud se realiza junto con el de productos)
+CREATE PROCEDURE actualizarPrecioLicores (@ID_Catalogo int, @Precio money)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from CATALOGO where id=@ID_Catalogo
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			update CATALOGO set PRECIO=@Precio
+				where ID=@ID_Catalogo
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del precio del licor',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+
+--------------- CRUD Combinacion ---------------
+
+-- Insertar tipo annejado
+CREATE PROCEDURE agregarCombinacion (@Nombre_Producto varchar(35), @Descripcion varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from COMBINACION where Upper(PRODUCTO)=Upper(@Nombre_Producto)
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<1) or (@existe is null)
+			begin
+			insert into COMBINACION values (@Nombre_Producto,@Descripcion)
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion de la combinacion',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar tipo annejado 
+CREATE PROCEDURE actualizarTipoAnnejado (@ID_Annejado int, @Nombre_Annejado varchar(20), @Descripcion varchar(200))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from TIPO_ANNEJADO where ID=@ID_Annejado
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			update TIPO_ANNEJADO set Nombre=@Nombre_Annejado, Descripcion=@Descripcion where ID=@ID_Annejado
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del tipo de annejado',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar tipo de annejado
+CREATE PROCEDURE eliminarTipoAnnejado (@ID_Annejado int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from TIPO_ANNEJADO where id=@ID_Annejado
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			delete TIPO_ANNEJADO where id=@ID_Annejado
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion del tipo de annejado',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar Tipo de annejado
+CREATE PROCEDURE seleccionarTipoAnnejado (@ID_Annejado int, @Nombre_Annejado varchar(25))
+AS
+BEGIN
+	select ID, Nombre, Descripcion from Tipo_Annejado where ID=isnull(@ID_Annejado,ID) and Nombre like '%'+isnull(@Nombre_Annejado,Nombre)+'%'
 END
 GO
