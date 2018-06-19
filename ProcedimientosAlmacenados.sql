@@ -1255,7 +1255,7 @@ GO
 
 --------------- CRUD Combinacion ---------------
 
--- Insertar tipo annejado
+-- Insertar combinacion
 CREATE PROCEDURE agregarCombinacion (@Nombre_Producto varchar(35), @Descripcion varchar(200))
 AS
 BEGIN
@@ -1292,21 +1292,21 @@ BEGIN
 END
 GO
 
--- Actualizar tipo annejado 
-CREATE PROCEDURE actualizarTipoAnnejado (@ID_Annejado int, @Nombre_Annejado varchar(20), @Descripcion varchar(200))
+-- Actualizar combinacion 
+CREATE PROCEDURE actualizarCombinacion (@ID_Combinacion int, @Nombre_Producto varchar(35), @Descripcion varchar(200))
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from TIPO_ANNEJADO where ID=@ID_Annejado
+	select @existe=id from COMBINACION where ID=@ID_Combinacion
 
 	BEGIN TRY
 		BEGIN
 			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			update TIPO_ANNEJADO set Nombre=@Nombre_Annejado, Descripcion=@Descripcion where ID=@ID_Annejado
+			update COMBINACION set PRODUCTO=@Nombre_Producto, Descripcion=@Descripcion where ID=@ID_Combinacion
 				select 1
 			  
 			end
@@ -1319,7 +1319,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la actualizacion del tipo de annejado',1,1)
+			raiserror('Ha ocurrido un problema durante la actualizacion de la combinacion',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -1329,21 +1329,21 @@ BEGIN
 END
 GO
 
--- Eliminar tipo de annejado
-CREATE PROCEDURE eliminarTipoAnnejado (@ID_Annejado int)
+-- Eliminar COMBINACION
+CREATE PROCEDURE eliminarCombinacion (@ID_Combinacion int)
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from TIPO_ANNEJADO where id=@ID_Annejado
+	select @existe=id from COMBINACION where id=@ID_Combinacion
 
 	BEGIN TRY
 		BEGIN
 			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			delete TIPO_ANNEJADO where id=@ID_Annejado
+			delete COMBINACION where id=@ID_Combinacion
 				select 1
 			  
 			end
@@ -1356,7 +1356,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la eliminacion del tipo de annejado',1,1)
+			raiserror('Ha ocurrido un problema durante la eliminacion de la combinacion',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -1366,10 +1366,10 @@ BEGIN
 END
 GO
 
--- Seleccionar Tipo de annejado
-CREATE PROCEDURE seleccionarTipoAnnejado (@ID_Annejado int, @Nombre_Annejado varchar(25))
+-- Seleccionar Combinacion
+CREATE PROCEDURE seleccionarCombinacion (@ID_Combinacion int, @Nombre_Producto varchar(25))
 AS
 BEGIN
-	select ID, Nombre, Descripcion from Tipo_Annejado where ID=isnull(@ID_Annejado,ID) and Nombre like '%'+isnull(@Nombre_Annejado,Nombre)+'%'
+	select ID, Producto, Descripcion from COMBINACION where ID=isnull(@ID_Combinacion,ID) and PRODUCTO like '%'+isnull(@Nombre_Producto,PRODUCTO)+'%'
 END
 GO
