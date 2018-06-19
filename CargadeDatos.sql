@@ -1,4 +1,5 @@
 -- Carga de datos
+Use Licores
 
 -- Horario
 insert into Horario values(PARSE('7:00:00' AS time USING 'en-US'),PARSE('5:00:00' AS time USING 'en-US'),'L-V')
@@ -34,28 +35,27 @@ Insert into tipo_annejado values ('Joven','Llamado vin primeur en francés, es un
 									('Reserva','Son vinos con tres años de añejamiento, de los cuales al menos uno en madera.'),
 									('Gran Reserva','Son vinos con al menos cinco años de añejamiento, de los cuales al menos dos en madera.'),
 									('Ninguno','No posee ningún tipo de añejamiento')
-
 -- Catalogo
-Insert into Catalogo values (5,1,'Merlot', 2018, 7000, null),
-							(1,3,'Cabernet Sauvignon', 2015, 16000, null),
-							(6,4,'Malbec', 2012, 24000, null),
-							(7,1,'Chardonnay', 2017, 5000, null),
-							(4,1,'Sauvignon Blanc', 2018, 5500, null),
+Insert into Catalogo values (1,5,'Merlot', 2018, 7000, null),
+							(3,1,'Cabernet Sauvignon', 2015, 16000, null),
+							(4,6,'Malbec', 2012, 24000, null),
+							(1,7,'Chardonnay', 2017, 5000, null),
+							(1,4,'Sauvignon Blanc', 2018, 5500, null),
 							(2,2,'Riesling', 2016, 6200, null)
 
 
 -- Inventario
-insert into inventario values (3,2,20),
-								(3,4,25),
-								(3,1,10),
-								(3,6,30),
-								(4,3,23),
-								(4,5,18),
+insert into inventario values (2,3,20),
+								(4,3,25),
+								(1,3,10),
+								(6,3,30),
+								(3,4,23),
+								(5,4,18),
 								(1,1,34),
-								(1,3,6),
-								(1,2,14),
-								(4,6,29),
-								(4,4,41)
+								(3,1,6),
+								(2,1,14),
+								(6,4,29),
+								(4,4,41)				
 
 -- Metodo de pago
 insert into Metodo_Pago values ('Tarjeta'),
