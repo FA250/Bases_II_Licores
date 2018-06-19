@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2005                    */
-/* Created on:     6/18/2018 3:04:50 PM                         */
+/* Created on:     6/19/2018 12:53:52 PM                        */
 /*==============================================================*/
 
 
@@ -65,6 +65,13 @@ if exists (select 1
    where r.fkeyid = object_id('INVENTARIO') and o.name = 'FK_INVENTAR___SUCURSAL')
 alter table INVENTARIO
    drop constraint FK_INVENTAR___SUCURSAL
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('SUCURSAL') and o.name = 'FK_SUCURSAL___DIRECCIO')
+alter table SUCURSAL
+   drop constraint FK_SUCURSAL___DIRECCIO
 go
 
 if exists (select 1
@@ -163,6 +170,13 @@ if exists (select 1
            where  id = object_id('DESCUENTO')
             and   type = 'U')
    drop table DESCUENTO
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('DIRECCION')
+            and   type = 'U')
+   drop table DIRECCION
 go
 
 if exists (select 1
@@ -305,6 +319,19 @@ create table DESCUENTO (
 go
 
 /*==============================================================*/
+/* Table: DIRECCION                                             */
+/*==============================================================*/
+create table DIRECCION (
+   ID                   int                  identity,
+   PAIS                 varchar(25)          null,
+   PROVINCIA            varchar(25)          null,
+   CANTON               varchar(25)          null,
+   DETALLE              varchar(200)         null,
+   constraint PK_DIRECCION primary key (ID)
+)
+go
+
+/*==============================================================*/
 /* Table: HORARIO                                               */
 /*==============================================================*/
 create table HORARIO (
@@ -333,7 +360,7 @@ go
 /*==============================================================*/
 create table LUGAR_PROCEDENCIA (
    ID                   int                  identity,
-   PAIS                 varchar(20)          null,
+   PAIS                 varchar(25)          null,
    constraint PK_LUGAR_PROCEDENCIA primary key (ID)
 )
 go
@@ -375,8 +402,9 @@ go
 /* Table: SUCURSAL                                              */
 /*==============================================================*/
 create table SUCURSAL (
-   ID                   int                  identity,
+   ID                   int                  not null,
    ID_HORARIO           int                  null,
+   ID_DIRECCION         int                  null,
    NOMBRE               varchar(20)          null,
    UBICACION            geometry             null,
    constraint PK_SUCURSAL primary key (ID)
@@ -482,6 +510,11 @@ go
 alter table INVENTARIO
    add constraint FK_INVENTAR___SUCURSAL foreign key (ID_SUCURSAL)
       references SUCURSAL (ID)
+go
+
+alter table SUCURSAL
+   add constraint FK_SUCURSAL___DIRECCIO foreign key (ID_DIRECCION)
+      references DIRECCION (ID)
 go
 
 alter table SUCURSAL
