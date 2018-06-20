@@ -416,6 +416,26 @@ Begin
 							end,							
 							getdate(),@Identificacion_Cliente,@Monto_Total)
 
+			end
+			else
+			begin
+				select 0
+			end
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante el registro de la factura',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+	COMMIT TRANSACTION
+
+
+
+	
+		
+
 				--Recupera el id de la ultima insercion de las ventas
 				declare @ID_Venta int
 				set @ID_Venta=SCOPE_IDENTITY()
@@ -431,8 +451,23 @@ Begin
 
 					if (Len(@ID_CV)>0) or (@ID_CV is not null)
 					begin
+						BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert2;
+
+
+	BEGIN TRY
+		BEGIN
 						update Catalogo_Venta set ID_Venta=@ID_Venta where ID=@ID_CV
 						delete Temp_IDs_Catalogo_Venta where ID_Catalogo_Venta=@ID_CV
+							END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante el registro de la factura',1,1)
+			ROLLBACK TRANSACTION BeforeInsert2;
+		END
+	END CATCH
+	COMMIT TRANSACTION
 					end
 					else 
 					begin
@@ -441,20 +476,6 @@ Begin
 					end
 				end
 				select 1
-			end
-			else
-			begin
-				select 0
-			end
-		END
-	END TRY
-	BEGIN CATCH
-		BEGIN
-			raiserror('Ha ocurrido un problema durante el registro de la factura',1,1)
-			ROLLBACK TRANSACTION BeforeInsert;
-		END
-	END CATCH
-	COMMIT TRANSACTION
 		
 END
 GO
