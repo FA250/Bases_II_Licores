@@ -18,15 +18,16 @@ namespace LicoreraWeb
     {
         String fecha1;
         String fecha2;
-
-
         SqlConnection conn;
+
+        
 
 
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            ConsultarProcedencia();
+            ConsultarTipoAnnejado();
         }
 
         protected void button_consultarVentas_Click(object sender, EventArgs e)
@@ -82,6 +83,82 @@ namespace LicoreraWeb
 
 
 
+
+        }
+        
+
+        protected void ConsultarTipoAnnejado()
+        {
+
+            this.conn = (SqlConnection)Session["SQL"];
+            SqlCommand cmd = new SqlCommand("seleccionarTipoAnnejado", conn);
+
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("@ID_Annejado", SqlDbType.Int) { Value = DBNull.Value });
+            cmd.Parameters.Add(new SqlParameter("@Nombre_Annejado", SqlDbType.VarChar, 25) { Value = DBNull.Value });
+            
+            // execute the command
+            using (SqlDataReader rdr = cmd.ExecuteReader())
+            {
+                String idTipoConsultadoString = "";
+                String nombreTipoConsultadoString = "";
+                int idTipo = 0;
+                ListItem item = new ListItem();
+
+
+                while (rdr.Read())
+                {
+
+                    idTipo = rdr.GetInt32(0);
+                    idTipoConsultadoString = idTipo.ToString();
+                    nombreTipoConsultadoString = rdr.GetString(1);
+
+                    item = new ListItem();
+                    item.Value = idTipoConsultadoString;
+                    item.Text = nombreTipoConsultadoString;
+                    this.dropdownlist_tipoAnejado.Items.Add(item);
+                    //Console.WriteLine("Product: {0,-35} Total: {1,2}", rdr["ProductName"], rdr["Total"]);
+                }
+            }
+
+
+        }
+        protected void ConsultarProcedencia()
+        {
+
+
+            this.conn = (SqlConnection)Session["SQL"];
+            SqlCommand cmd = new SqlCommand("seleccionarLugarProcedencia", conn);
+
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("@ID_Lugar", SqlDbType.Int, 10) { Value = DBNull.Value });
+            cmd.Parameters.Add(new SqlParameter("@Nombre_lugar", SqlDbType.VarChar, 25) { Value = DBNull.Value });
+
+            // execute the command
+            using (SqlDataReader rdr = cmd.ExecuteReader())
+            {
+                String idLugarConsultadoString = "";
+                String nombreLugarConsultadoString = "";
+                int idLugar = 0;
+                ListItem item = new ListItem();
+                
+
+                while (rdr.Read())
+                {
+
+                    idLugar = rdr.GetInt32(0);
+                    idLugarConsultadoString = idLugar.ToString();
+                    nombreLugarConsultadoString = rdr.GetString(1);
+
+                    item = new ListItem();
+                    item.Value = idLugarConsultadoString;
+                    item.Text = nombreLugarConsultadoString;
+                    this.dropdownlist_paisNuevoProducto.Items.Add(item);
+                    //Console.WriteLine("Product: {0,-35} Total: {1,2}", rdr["ProductName"], rdr["Total"]);
+                }
+            }
 
         }
 
@@ -635,11 +712,13 @@ namespace LicoreraWeb
             // execute the command
             using (SqlDataReader rdr = cmd.ExecuteReader())
             {
+                int precio = 0;
                 // iterate through results, printing each to console
                 while (rdr.Read())
                 {
                     //Console.WriteLine("Product: {0,-35} Total: {1,2}", rdr["ProductName"], rdr["Total"]);
-                    this.label_precioConsultado.Text = (String)rdr["precio"];
+                    precio = (int) rdr.GetSqlMoney(0);
+                    this.label_precioConsultado.Text = precio.ToString();
                 }
             }
 
@@ -693,7 +772,7 @@ namespace LicoreraWeb
                 // iterate through results, printing each to console
                 while (rdr.Read())
                 {
-                    int resultado = rdr.GetInt16(0);
+                    int resultado = rdr.GetInt32(0);
                     if(resultado == 1)
                     {
                         Response.Write("<script>alert('Nuevo Producto ingresado') </script>");
@@ -782,6 +861,11 @@ namespace LicoreraWeb
                 }
 
             }
+        }
+
+        protected void button_siguiente_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Administrador2.aspx");
         }
     }
 }

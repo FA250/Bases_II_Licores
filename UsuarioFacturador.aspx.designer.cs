@@ -31,13 +31,31 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Label label_facturarCliente;
         
         /// <summary>
-        /// label_Ingrese control.
+        /// label_idCliente control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label label_Ingrese;
+        protected global::System.Web.UI.WebControls.Label label_idCliente;
+        
+        /// <summary>
+        /// label_idSucursal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_idSucursal;
+        
+        /// <summary>
+        /// textbox_idSucursal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textbox_idSucursal;
         
         /// <summary>
         /// textbox_idCliente control.
@@ -103,6 +121,24 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Label label_ProductoAFacturar;
         
         /// <summary>
+        /// label_prueba control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_prueba;
+        
+        /// <summary>
+        /// label_cantidadProducto control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_cantidadProducto;
+        
+        /// <summary>
         /// dropdownlist_productosAFacturar control.
         /// </summary>
         /// <remarks>
@@ -119,15 +155,6 @@ namespace LicoreraWeb {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label label_idProducto;
-        
-        /// <summary>
-        /// label_cantidadProducto control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label label_cantidadProducto;
         
         /// <summary>
         /// textbox_idProducto control.

@@ -47,6 +47,7 @@ namespace LicoreraWeb
                 "Password=1234;";
                 conn.Open();
                 Session["SQL"] = conn; // El objeto queda en la sesion para poder ser compartido entre las paginas
+                
 
                 // Valores de Interfaz
                 String tipoUsuario = RadioButtonList1.SelectedItem.Text;
@@ -88,6 +89,7 @@ namespace LicoreraWeb
                         break;
 
                 }
+                Session["idUsuario"] = numeroUsuario;
 
 
                 // Parametro de numero de usuario

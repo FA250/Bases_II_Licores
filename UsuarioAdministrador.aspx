@@ -36,7 +36,6 @@
         <asp:Label ID="Label3" runat="server" Text="Id:" style="z-index: 1; left: 10px; top: 257px; position: absolute"></asp:Label>
         <asp:Label ID="label_tipoAnejado" runat="server" style="z-index: 1; left: 413px; top: 404px; position: absolute; width: 157px" Text="Tipo Añejado:"></asp:Label>
         <asp:DropDownList ID="dropdownlist_tipoAnejado" runat="server" style="z-index: 1; left: 413px; top: 435px; position: absolute; width: 165px; height: 19px">
-            <asp:ListItem Value="0">clasico</asp:ListItem>
         </asp:DropDownList>
         <br />
         <asp:TextBox ID="textbox_idPActualizar" runat="server" style="z-index: 1; left: 10px; top: 279px; position: absolute"></asp:TextBox>
@@ -98,7 +97,6 @@
         <asp:Label ID="label_idSucursal0" runat="server" style="z-index: 1; left: 638px; top: 79px; position: absolute" Text="Id Sucursal:"></asp:Label>
         <asp:Button ID="button_consultarMasVendidos" runat="server" OnClick="button_consultarMasVendidos_Click" Text="Consultar Más Vendidos" Width="230px" style="z-index: 1; left: 14px; top: 621px; position: absolute; right: 999px;" />
         <asp:DropDownList ID="dropdownlist_paisNuevoProducto" runat="server" style="z-index: 1; left: 412px; top: 372px; position: absolute; width: 165px">
-            <asp:ListItem Value="0">Brasil</asp:ListItem>
         </asp:DropDownList>
         <br />
         <asp:Button ID="button_consultaSinSalida" runat="server" OnClick="Button4_Click" Text="Consultar No Vendidos" Width="231px" style="z-index: 1; left: 14px; top: 658px; position: absolute" />
@@ -107,10 +105,11 @@
         <asp:Label ID="label_paisNuevoProducto" runat="server" style="z-index: 1; left: 411px; top: 346px; position: absolute; width: 162px" Text="País:"></asp:Label>
         <br />
         <br />
-        <asp:Button ID="button_Volver" runat="server" OnClick="button_Volver_Click" Text="Volver" style="z-index: 1; left: 14px; top: 696px; position: absolute; right: 1769px" />
+        <asp:Button ID="button_Volver" runat="server" OnClick="button_Volver_Click" Text="Volver" style="z-index: 1; left: 19px; top: 692px; position: absolute; width: 71px;" />
         <br />
     
     </div>
+        <asp:Button ID="button_siguiente" runat="server" OnClick="button_siguiente_Click" style="z-index: 1; left: 178px; top: 694px; position: absolute" Text="Siguiente" />
     </form>
 </body>
 </html>

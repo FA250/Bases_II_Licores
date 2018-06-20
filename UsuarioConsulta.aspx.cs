@@ -8,6 +8,10 @@ using System.Web.UI.WebControls;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
+using Microsoft.SqlServer.Server;
+using Microsoft.SqlServer;
+
+
 
 namespace LicoreraWeb
 {
@@ -49,12 +53,12 @@ namespace LicoreraWeb
             // nombre nulo y id no nulo
             if (string.IsNullOrWhiteSpace(nombreProducto) && !string.IsNullOrWhiteSpace(idProductoString) )
             {
-
+                this.conn = (SqlConnection)Session["SQL"];
                 int idProducto = Int32.Parse(textbox_idProductoConsulta.Text);
                 int idSucursal = Int32.Parse(textbox_idSucursalActual.Text);
 
                 // Procedimiento almacenado
-                SqlCommand cmd = new SqlCommand("consultaProducto", conn);
+                SqlCommand cmd = new SqlCommand("consultaProductos", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
 
@@ -69,7 +73,8 @@ namespace LicoreraWeb
                 // byte[] myImage = (byte[])reader["MyImageColumn"];
                 byte[] fotoConsultada = null;
                 String nombreSucursalConsultada  = "";
-                int distancia = 0;
+                Double distancia = 0.0;
+                int idProductoConsultado = 0;
 
                 String lineaConsulta = "";
 
@@ -87,15 +92,17 @@ namespace LicoreraWeb
                     // iterate through results, printing each to console
                     while (rdr.Read())
                     {
-                        nombreConsultado = rdr.GetString(0);
-                        int precio = (int) rdr.GetSqlMoney(1);
+                        idProducto = rdr.GetInt32(0);
+                        nombreConsultado = rdr.GetString(1);
+                        int precio = (int) rdr.GetSqlMoney(2);
                         fotoConsultada = (byte[]) rdr["Foto"];
-                        nombreSucursalConsultada = rdr.GetString(3);
-                        distancia = rdr.GetInt16(4);
-                        lineaConsulta = "Nombre : " + nombreConsultado + " Precio: " + precio + " Nombre Sucursal: " + nombreSucursalConsultada + " Distancia: " + distancia;
+                        nombreSucursalConsultada = rdr.GetString(4);
+                        distancia = rdr.GetDouble(5);
+                        lineaConsulta = "Nombre : " + nombreConsultado + " ID: " + idProducto + " Precio: " + precio + " Nombre Sucursal: " + nombreSucursalConsultada + " Distancia: " + distancia;
 
                         // Se anaden los valores consultados a la interfaz
                         this.label_precioConsultado.Text = precio.ToString();
+                        item = new ListItem();
                         item.Text = lineaConsulta;
                         this.dropdownlist_sucursales.Items.Add(item);
 
