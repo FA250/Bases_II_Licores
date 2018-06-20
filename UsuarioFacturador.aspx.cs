@@ -14,42 +14,50 @@ using System.Collections;
 
 namespace LicoreraWeb
 {
+
+    public static class GlobalVariables
+    {
+        public static ArrayList listaIdProducto;
+        public static ArrayList listaCantidad;
+        public static ArrayList listaPrecioUnitario;
+    }
     public partial class UsuarioFacturador : System.Web.UI.Page
     {
-        public ArrayList listaIdProducto = new ArrayList();
-        public ArrayList listaCantidad  = new ArrayList();
-        public ArrayList listaPrecioUnitario = new ArrayList();
-
-
         SqlConnection conn;
-
-        
-
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (GlobalVariables.listaIdProducto == null)
+            {
+                GlobalVariables.listaIdProducto = new ArrayList();
+            }
 
+            if (GlobalVariables.listaCantidad == null)
+            {
+                GlobalVariables.listaCantidad = new ArrayList();
+            }
+
+            if (GlobalVariables.listaPrecioUnitario == null)
+            {
+                GlobalVariables.listaPrecioUnitario = new ArrayList();
+            }
         }
 
         protected void button_agregarProducto_Click(object sender, EventArgs e)
-        {
-
-       
+        {       
 
             int cantidadProducto = 0;
             int idProducto = 0;
-
-
 
 
             if (Int32.TryParse(textbox_cantidadProducto.Text, out cantidadProducto) &&
                 Int32.TryParse(textbox_idProducto.Text, out idProducto))
             {
 
-                if (!listaIdProducto.Contains(idProducto))
+                if (!GlobalVariables.listaIdProducto.Contains(idProducto))
                 {
-                    listaIdProducto.Add(idProducto);
-                    listaCantidad.Add(cantidadProducto);
+                    GlobalVariables.listaIdProducto.Add(idProducto);
+                    GlobalVariables.listaCantidad.Add(cantidadProducto);
 
                     String item = ("ID: " + idProducto.ToString() + " Cantidad: " + cantidadProducto.ToString());
                     this.dropdownlist_productosAFacturar.Items.Add(new ListItem(item));
@@ -58,9 +66,9 @@ namespace LicoreraWeb
                 }
                 else
                 {
-                    int pos = listaIdProducto.IndexOf(idProducto);
-                    int nuevaCantidad = (int)listaCantidad[pos] + cantidadProducto;
-                    listaCantidad[pos] = nuevaCantidad;
+                    int pos = GlobalVariables.listaIdProducto.IndexOf(idProducto);
+                    int nuevaCantidad = (int)GlobalVariables.listaCantidad[pos] + cantidadProducto;
+                    GlobalVariables.listaCantidad[pos] = nuevaCantidad;
                     String item = ("ID: " + idProducto.ToString() + " Cantidad: " + cantidadProducto.ToString());
                     this.dropdownlist_productosAFacturar.Items.Add(new ListItem(item));
 
@@ -91,7 +99,7 @@ namespace LicoreraWeb
 
 
             // Prueba 
-            String prueba = "Largo lista id: " + listaIdProducto.Count + " Largo lista cantidad: " + listaCantidad.Count + " Lista precio unitario: " + listaPrecioUnitario.Count;
+            String prueba = "Largo lista id: " + GlobalVariables.listaIdProducto.Count + " Largo lista cantidad: " + GlobalVariables.listaCantidad.Count + " Lista precio unitario: " + GlobalVariables.listaPrecioUnitario.Count;
             label_prueba.Text = prueba;
 
             //this.dropdownlist_productosAFacturar.Items.Clear();
@@ -148,13 +156,13 @@ namespace LicoreraWeb
             int idSucursal = Int32.Parse(idSucursalString);
 
             // Cantidad total de items 
-            int totalItems = 0; 
-            for(int i = 0; i< this.listaCantidad.Count; i++)
+            int totalItems = 0;
+            for (int i = 0; i < GlobalVariables.listaCantidad.Count; i++)
             {
-                totalItems = totalItems + (int)listaCantidad[i];
+                totalItems = totalItems + (int)GlobalVariables.listaCantidad[i];
             }
             // Cantidad de Licores
-            int cantidadLicores = listaIdProducto.Count;
+            int cantidadLicores = GlobalVariables.listaIdProducto.Count;
             // Monto Total
             int montoTotal = this.CalcularMontoTotal();
 
@@ -172,21 +180,21 @@ namespace LicoreraWeb
 
 
             // Prueba 
-            String prueba = "Largo lista id: " + listaIdProducto.Count + " Largo lista cantidad: " + listaCantidad.Count + " Lista precio unitario: " + listaPrecioUnitario.Count;
+            String prueba = "Largo lista id: " + GlobalVariables.listaIdProducto.Count + " Largo lista cantidad: " + GlobalVariables.listaCantidad.Count + " Lista precio unitario: " + GlobalVariables.listaPrecioUnitario.Count;
             label_prueba.Text = prueba;
 
             // Fin de prueba
 
-            /*
 
-            for (int i = 0; i < listaIdProducto.Count; i++)
+
+            for (int i = 0; i < GlobalVariables.listaIdProducto.Count; i++)
             {
 
 
 
-                idCatalogo = listaIdProducto.ElementAt(i);
-                cantidadTemp = listaCantidad.ElementAt(i);
-                precioUnitario = listaPrecioUnitario.ElementAt(i);
+                idCatalogo = (int)GlobalVariables.listaIdProducto[i];
+                cantidadTemp = (int)GlobalVariables.listaCantidad[i];
+                precioUnitario = (int)GlobalVariables.listaPrecioUnitario[i];
                 subTotal = cantidadTemp * precioUnitario;
 
                 // Procedimiento almacenado  registrar catalogo
@@ -220,7 +228,7 @@ namespace LicoreraWeb
             // Prueba 
 
 
-            String prueba = "Largo lista id: " + listaIdProducto.Count + " Largo lista cantidad: " + listaCantidad.Count + " Lista precio unitario: " + listaPrecioUnitario;
+            prueba = "Largo lista id: " + GlobalVariables.listaIdProducto.Count + " Largo lista cantidad: " + GlobalVariables.listaCantidad.Count + " Lista precio unitario: " + GlobalVariables.listaPrecioUnitario;
             label_prueba.Text = prueba;
 
             // Fin de prueba
@@ -260,7 +268,7 @@ namespace LicoreraWeb
                    // Console.WriteLine("Product: {0,-35} Total: {1,2}", rdr["ProductName"], rdr["Total"]);
                 }
             }
-            */
+            
 
 
 
@@ -280,11 +288,11 @@ namespace LicoreraWeb
             int precioTemporal = 0;
             int cantidadTemporal = 0;
 
-            for(int i = 0; i < listaIdProducto.Count; i++)
+            for (int i = 0; i < GlobalVariables.listaIdProducto.Count; i++)
             {
 
-                id = (int)listaIdProducto[i];
-                cantidadTemporal = (int)listaCantidad[i];
+                id = (int)GlobalVariables.listaIdProducto[i];
+                cantidadTemporal = (int)GlobalVariables.listaCantidad[i];
                 precioTemporal = 0;
                 
 
@@ -302,7 +310,7 @@ namespace LicoreraWeb
                     {
                         precioTemporal = rdr.GetInt32(0);
                         montoTotal = montoTotal + (precioTemporal * cantidadTemporal);
-                        listaPrecioUnitario.Add(precioTemporal);
+                        GlobalVariables.listaPrecioUnitario.Add(precioTemporal);
                     }
                 }
 

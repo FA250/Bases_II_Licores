@@ -51,7 +51,7 @@
         <asp:Button ID="button_agregarProducto" runat="server" Text="Agregar Producto" Width="288px" OnClick="button_agregarProducto_Click" style="z-index: 1; left: 10px; top: 474px; position: absolute" />
         <br />
         <br />
-        <asp:Button ID="button_facturar" runat="server" style="z-index: 1; left: 14px; top: 657px; position: absolute; margin-bottom: 3px" Text="Facturar" Width="273px" OnClick="Button1_Click" />
+        <asp:Button ID="button_facturar" runat="server" style="z-index: 1; left: 14px; top: 657px; position: absolute; margin-bottom: 3px" Text="Facturar" Width="273px" OnClick="Button1_Click" UseSubmitBehavior="False" />
         <br />
         <br />
         <br />
