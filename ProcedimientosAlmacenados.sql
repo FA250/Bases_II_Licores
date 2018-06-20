@@ -28,9 +28,15 @@ BEGIN
 	set @existe=null
 	select @existe=cedula from usuario where cedula=@Cedula
 
+	declare @existe_sucursal int
+	select @existe_sucursal=id from Sucursal where ID=@ID_Sucursal
+
+	declare @existe_nivel int
+	select @existe_nivel=id from Nivel where ID=@ID_Nivel
+
 	BEGIN TRY
 		BEGIN
-			if (Len(@existe)<1) or (@existe is null)
+			if((Len(@existe)>0) or (@existe is not null)) and (Len(@existe_sucursal)>0) or (@existe_sucursal is not null)  and (Len(@existe_nivel)>0) or (@existe_nivel is not null)
 			begin
 				declare @id_nombre int
 				set @id_nombre=NULL
@@ -278,10 +284,11 @@ BEGIN
 	declare @ubicacionActual geometry
 	Select @ubicacionActual=Ubicacion from Sucursal where ID=@ID_Sucursal
 
-	select C.ID, C.Nombre, C.Precio, C.Foto, S.Nombre As Sucursal, S.Ubicacion.STDistance(@ubicacionActual), I.Cantidad
+	select C.ID, C.Nombre, C.Precio, C.Foto, S.Nombre As Sucursal, S.Ubicacion.STDistance(@ubicacionActual) as distancia, I.Cantidad
 	from Catalogo C join Inventario I on C.ID=I.ID_Catalogo
 			join Sucursal S on I.ID_Sucursal=S.ID
 	where C.ID=isnull(@ID_producto,C.ID) and C.Nombre like '%'+isnull(@Nombre_Producto,C.Nombre)+'%'
+	order by distancia desc
 END
 GO
 
@@ -1047,7 +1054,7 @@ AS
 BEGIN
 	select ID,ENTRADA,SALIDA,DIAS
 	from Horario
-	where ID=isnull(@ID_Horario,ID)
+	where ID=@ID_Horario
 END
 GO
 
@@ -1173,7 +1180,7 @@ AS
 BEGIN
 	select ID,Pais,PROVINCIA,CANTON,DETALLE
 	from Direccion
-	where ID=isnull(@ID_Direccion,ID)
+	where ID=@ID_Direccion
 END
 GO
 
@@ -1383,60 +1390,30 @@ GO
 
 -- Insertar empleado
 -- Procedimiento registrarUsuario (es el segundo de este archivo)
-/*
+
 -- Actualizar empleado 
-CREATE PROCEDURE actualizarEmpleado (@Cedula int, @Contrasenna varchar(10), @Foto varbinary(max), @Nombre varchar(20), @Apellido1 varchar(20), @Apellido2 varchar(20), @Celular int, @Telefono int, @ID_Nivel int, @ID_Sucursal int)
+CREATE PROCEDURE actualizarUsuario (@Cedula int, @Contrasenna varchar(10), @Foto varbinary(max), @Nombre varchar(20), @Apellido1 varchar(20), @Apellido2 varchar(20), @Celular int, @Telefono int, @ID_Nivel int, @ID_Sucursal int)
 AS
 BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
 	declare @existe int
-	select @existe=id from Usuario where Cedula=@Cedula
+	select @existe=Cedula from Usuario where Cedula=@Cedula
+
+	declare @existe_sucursal int
+	select @existe_sucursal=id from Sucursal where ID=@ID_Sucursal
+
+	declare @existe_nivel int
+	select @existe_nivel=id from Nivel where ID=@ID_Nivel
 
 	BEGIN TRY
 		BEGIN
-			if(Len(@existe)>0) or (@existe is not null)
+			if((Len(@existe)>0) or (@existe is not null)) and (Len(@existe_sucursal)>0) or (@existe_sucursal is not null)  and (Len(@existe_nivel)>0) or (@existe_nivel is not null)
 			begin
 			update Usuario set Contrasenna=isnull(@Contrasenna,Contrasenna), Foto=isnull(@Foto,Foto),  ID_Nivel=isnull(@ID_Nivel,ID_Nivel), ID_Sucursal=isnull(@ID_Sucursal,ID_Sucursal) where Cedula=@Cedula
-			update Nombre set Nombre=@Nombre, Apell
-				select 
-			  
-			end
-			else
-			begin
-				select 0
-			end
-
-		END
-	END TRY
-	BEGIN CATCH
-		BEGIN
-			raiserror('Ha ocurrido un problema durante la actualizacion de la combinacion',1,1)
-			ROLLBACK TRANSACTION BeforeInsert;
-		END
-	END CATCH
-
-	COMMIT TRANSACTION
-	RETURN	
-END
-GO
-
--- Eliminar COMBINACION
-CREATE PROCEDURE eliminarCombinacion (@ID_Combinacion int)
-AS
-BEGIN
-	BEGIN TRANSACTION;
-	SAVE TRANSACTION BeforeInsert;
-
-	declare @existe int
-	select @existe=id from COMBINACION where id=@ID_Combinacion
-
-	BEGIN TRY
-		BEGIN
-			if(Len(@existe)>0) or (@existe is not null)
-			begin
-			delete COMBINACION where id=@ID_Combinacion
+			update Nombre set Nombre=isnull(@Nombre,nombre), Apellido1=isnull(@Apellido1,apellido1), Apellido2=ISNULL(@Apellido2,Apellido2) where ID=(select ID_Nombre from Usuario where ID=@Cedula)
+			update Telefono set Celular=isnull(@Celular,Celular), Telefono=isnull(@Telefono,Telefono) where ID=(select ID_Telefono from Usuario where ID=@Cedula)
 				select 1
 			  
 			end
@@ -1449,7 +1426,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		BEGIN
-			raiserror('Ha ocurrido un problema durante la eliminacion de la combinacion',1,1)
+			raiserror('Ha ocurrido un problema durante la actualizacion del usuario',1,1)
 			ROLLBACK TRANSACTION BeforeInsert;
 		END
 	END CATCH
@@ -1459,12 +1436,107 @@ BEGIN
 END
 GO
 
--- Seleccionar Combinacion
-CREATE PROCEDURE seleccionarCombinacion (@ID_Combinacion int, @Nombre_Producto varchar(25))
+-- Eliminar Empleado
+CREATE PROCEDURE eliminarUsuario (@Cedula int)
 AS
 BEGIN
-	select ID, Producto, Descripcion from COMBINACION where ID=isnull(@ID_Combinacion,ID) and PRODUCTO like '%'+isnull(@Nombre_Producto,PRODUCTO)+'%'
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=Cedula from Usuario where Cedula=@Cedula
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+				delete Usuario where Cedula=@Cedula
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion del usuario ',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
 END
+GO
+
+-- Seleccionar Empleado
+CREATE PROCEDURE seleccionarUsuario (@Cedula int, @Nombre varchar(20), @Apellido1 varchar(20))
+AS
+BEGIN
+	select N.Nombre, N.Apellido1, N.Apellido2, Tel.Celular, Tel.Telefono, T.Nombre As Tipo_Usuario, S.Nombre as Sucursal, U.Foto 
+	from Usuario U join Nombre N on U.ID_Nombre=N.ID
+		join Telefono Tel on U.ID_Telefono= Tel.ID
+		join Nivel T on U.ID_Nivel=T.ID
+		join Sucursal S on U.ID_Sucursal=S.ID 
+	where Cedula=isnull(@Cedula, U.Cedula) and N.Nombre like '%'+isnull(@Nombre, N.Nombre)+'%' and N.Apellido1 like '%'+isnull(@Apellido1, N.Apellido1)+'%'
+END
+go
+
+CREATE PROCEDURE seleccionarUsuarioSucursal (@Cedula int, @Nombre varchar(20), @Apellido1 varchar(20), @ID_Sucursal int, @Nombre_Sucursal varchar(20))
+AS
+BEGIN
+	select N.Nombre, N.Apellido1, N.Apellido2, Tel.Celular, Tel.Telefono, T.Nombre As Tipo_Usuario, S.Nombre as Sucursal, U.Foto 
+	from Usuario U join Nombre N on U.ID_Nombre=N.ID
+		join Telefono Tel on U.ID_Telefono= Tel.ID
+		join Nivel T on U.ID_Nivel=T.ID
+		join Sucursal S on U.ID_Sucursal=S.ID
+	where Cedula=isnull(@Cedula, U.Cedula) and N.Nombre like '%'+isnull(@Nombre, N.Nombre)+'%' and N.Apellido1 like '%'+isnull(@Apellido1, N.Apellido1)+'%'
+			and S.ID=isnull(@ID_Sucursal,S.ID) and S.Nombre like '%'+isnull(@Nombre_Sucursal,S.Nombre)+'%'
+END
+go
+
+-- Actualizar Empleado Sucursal
+CREATE PROCEDURE actualizarUsuarioSucursal (@Cedula int, @ID_Sucursal int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=Cedula from Usuario where Cedula=@Cedula
+
+	declare @existe_sucursal int
+	select @existe_sucursal=id from Sucursal where ID=@ID_Sucursal
+
+	BEGIN TRY
+		BEGIN
+			if((Len(@existe)>0) or (@existe is not null)) and (Len(@existe_sucursal)>0) or (@existe_sucursal is not null)
+			begin
+			update Usuario set ID_Sucursal=isnull(@ID_Sucursal,ID_Sucursal) where Cedula=@Cedula
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del usuario',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT 
+END
+go
 
 
 --*/
