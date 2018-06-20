@@ -393,11 +393,13 @@ Begin
 
 	declare @acumulado int	
 	select @acumulado=sum(Monto_Total) from Venta where datepart(month,Fecha_Compra)=datepart(month,getdate())
+
 	declare @id_descuento int, @descuento numeric(4,3)
 	select @id_descuento=ID, @descuento=descuento from Descuento where monto_mensual <= @acumulado and activo=1 order by monto_mensual desc
 
 	declare @existe_metodoPago int, @existe_sucursal int, @existe_usuario int
 	select @existe_metodoPago=ID from Metodo_Pago where ID=@ID_Metodo_Pago
+
 	select @existe_sucursal=ID from Sucursal where ID=@ID_Sucursal
 	select @existe_usuario=Cedula from Usuario where Cedula=@ID_Usuario
 
@@ -427,7 +429,7 @@ Begin
 		
 					select top (1) @ID_CV=ID_Catalogo_Venta from Temp_IDs_Catalogo_Venta where Identificacion_Cliente=@Identificacion_Cliente order by ID_Catalogo_Venta desc
 
-					if (Len(@ID_CV)<1) or (@ID_CV is null)
+					if (Len(@ID_CV)>0) or (@ID_CV is not null)
 					begin
 						update Catalogo_Venta set ID_Venta=@ID_Venta where ID=@ID_CV
 						delete Temp_IDs_Catalogo_Venta where ID_Catalogo_Venta=@ID_CV
@@ -459,6 +461,20 @@ GO
 
 
 
+
+
+
+
+--------------- consulta retenciones ---------------
+CREATE PROCEDURE consultaRetenciones (@mes int)
+AS
+BEGIN
+	select sum(Impuesto_Venta*Monto_Total) as Retencion, datepart(month,Fecha_Compra) as Mes
+	from Venta
+	where datepart(month,Fecha_Compra)=isnull(@mes,datepart(month,Fecha_Compra))
+	group by Fecha_Compra
+END
+GO
 
 
 
