@@ -28,9 +28,7 @@ namespace LicoreraWeb
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Session["listaID"] = this.listaIdProducto;
-            Session["listaCantidad"] = this.listaCantidad;
-            Session["listaPrecio"] = this.listaPrecioUnitario;
+
         }
 
         protected void button_agregarProducto_Click(object sender, EventArgs e)
@@ -41,11 +39,6 @@ namespace LicoreraWeb
             int cantidadProducto = 0;
             int idProducto = 0;
 
-            ArrayList listaIdProducto2 = (ArrayList)Session["listaID"];
-            ArrayList listaCantidad2 = (ArrayList)Session["listaCantidad"];
-
-
-
 
 
 
@@ -53,10 +46,10 @@ namespace LicoreraWeb
                 Int32.TryParse(textbox_idProducto.Text, out idProducto))
             {
 
-                if (!listaIdProducto2.Contains(idProducto))
+                if (!listaIdProducto.Contains(idProducto))
                 {
-                    listaIdProducto2.Add(idProducto);
-                    listaCantidad2.Add(cantidadProducto);
+                    listaIdProducto.Add(idProducto);
+                    listaCantidad.Add(cantidadProducto);
 
                     String item = ("ID: " + idProducto.ToString() + " Cantidad: " + cantidadProducto.ToString());
                     this.dropdownlist_productosAFacturar.Items.Add(new ListItem(item));
@@ -65,9 +58,9 @@ namespace LicoreraWeb
                 }
                 else
                 {
-                    int pos = listaIdProducto2.IndexOf(idProducto);
-                    int nuevaCantidad = (int)listaCantidad2[pos] + cantidadProducto;
-                    listaCantidad2[pos] = nuevaCantidad;
+                    int pos = listaIdProducto.IndexOf(idProducto);
+                    int nuevaCantidad = (int)listaCantidad[pos] + cantidadProducto;
+                    listaCantidad[pos] = nuevaCantidad;
                     String item = ("ID: " + idProducto.ToString() + " Cantidad: " + cantidadProducto.ToString());
                     this.dropdownlist_productosAFacturar.Items.Add(new ListItem(item));
 
@@ -94,8 +87,6 @@ namespace LicoreraWeb
 
 
 
-            Session["listaID"] = listaIdProducto2;
-            Session["listaCantidad"] = listaCantidad2;
 
 
 
