@@ -19,7 +19,7 @@
         <br />
         <asp:Label ID="label_consultarProducto" runat="server" style="z-index: 1; left: 134px; top: 3px; position: absolute; width: 234px" Text="Consulta de Producto"></asp:Label>
         <br />
-        <asp:Button ID="button_consultarHorario" runat="server" style="z-index: 1; left: 779px; top: 93px; position: absolute; width: 253px" Text="Consultar Horario" OnClick="button_consultarHorario_Click" />
+        <asp:Button ID="button_consultarHorario" runat="server" style="z-index: 1; left: 781px; top: 93px; position: absolute; width: 253px" Text="Consultar Horario" OnClick="button_consultarHorario_Click" />
         <asp:Label ID="label_idProductoConsulta" runat="server" style="z-index: 1; left: 136px; top: 94px; position: absolute; width: 212px" Text="Id del Producto:"></asp:Label>
         <br />
         <asp:Button ID="button_consultarProducto" runat="server" style="z-index: 1; left: 135px; top: 213px; position: absolute; margin-top: 4px; width: 212px;" Text="Consultar Producto" OnClick="button_consultarProducto_Click" />
@@ -38,7 +38,7 @@
         <br />
         <br />
         <asp:Label ID="label_sucursales" runat="server" style="z-index: 1; left: 377px; top: 332px; position: absolute" Text="Disponible en las siguientes sucursales:"></asp:Label>
-        <asp:Table ID="table_horarios" runat="server" style="z-index: 1; left: 785px; top: 139px; position: absolute; height: 28px; width: 238px">
+        <asp:Table ID="table_horarios" runat="server" style="z-index: 1; left: 785px; top: 139px; position: absolute; height: 28px; width: 238px" BorderColor="Black" BorderStyle="Solid" GridLines="Both">
         </asp:Table>
         <br />
         <br />
@@ -55,7 +55,12 @@
         <br />
         <br />
         <br />
+        <asp:Label ID="label_consultaEmpleadosSucursal" runat="server" style="z-index: 1; left: 442px; top: 5px; position: absolute; height: 21px" Text="Consulta Empleados Sucursal"></asp:Label>
+        <asp:Label ID="label_idSucursalConsultaEmpleados" runat="server" style="z-index: 1; left: 445px; top: 35px; position: absolute; width: 227px" Text="ID Sucursal:"></asp:Label>
+        <asp:TextBox ID="textbox_idSucursalConsultaEmpleado" runat="server" style="z-index: 1; left: 445px; top: 64px; position: absolute; width: 224px"></asp:TextBox>
         <br />
+        <asp:Button ID="button_consultaEmpleados" runat="server" OnClick="button_consultaEmpleados_Click" style="z-index: 1; left: 448px; top: 99px; position: absolute; width: 224px" Text="Consultar Empleados" />
+        <asp:Label ID="label12" runat="server" Text="Label"></asp:Label>
         <br />
         <br />
         <asp:Button ID="button_volver" runat="server" OnClick="button_volver_Click" style="z-index: 1; left: 3px; top: 582px; position: absolute" Text="Volver" />

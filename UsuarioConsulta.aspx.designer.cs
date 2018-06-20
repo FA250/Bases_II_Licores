@@ -193,6 +193,51 @@ namespace LicoreraWeb {
         protected global::System.Web.UI.WebControls.Image image_fotoProducto;
         
         /// <summary>
+        /// label_consultaEmpleadosSucursal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_consultaEmpleadosSucursal;
+        
+        /// <summary>
+        /// label_idSucursalConsultaEmpleados control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label_idSucursalConsultaEmpleados;
+        
+        /// <summary>
+        /// textbox_idSucursalConsultaEmpleado control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textbox_idSucursalConsultaEmpleado;
+        
+        /// <summary>
+        /// button_consultaEmpleados control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button button_consultaEmpleados;
+        
+        /// <summary>
+        /// label12 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label label12;
+        
+        /// <summary>
         /// button_volver control.
         /// </summary>
         /// <remarks>
