@@ -48,17 +48,17 @@ BEGIN
 	
 				if (@id_nombre is NULL) or (Len(@id_nombre)<1)
 				begin
-					insert into nombre values(@Cedula,@Nombre,@Apellido1,@Apellido2)
+					insert into nombre (ID,Nombre,Apellido1,Apellido2) values(@Cedula,@Nombre,@Apellido1,@Apellido2)
 					set @id_nombre=@Cedula
 				end
 	
 				if (@id_telefono is NULL) or (Len(@id_telefono)<1)
 				begin
-					insert into TELEFONO values (@Cedula,@Celular,@Telefono)
+					insert into TELEFONO (ID,Celular,Telefono) values (@Cedula,@Celular,@Telefono)
 					set @id_telefono=@cedula
 				end
 
-				Insert into Usuario values(@cedula, @id_nombre, @id_telefono, @id_nivel,@ID_Sucursal,@Contrasenna,@Foto)
+				Insert into Usuario (Cedula,ID_Nombre,ID_Telefono,ID_Nivel,ID_Sucursal,Contrasenna,Foto) values(@cedula, @id_nombre, @id_telefono, @id_nivel,@ID_Sucursal,@Contrasenna,@Foto)
 				select 1
 			end
 			else 
@@ -152,7 +152,7 @@ BEGIN
 		BEGIN
 			if(Len(@existe)<1) or (@existe is null)
 			begin
-				insert into catalogo values (@id_annejado, @ID_procedencia, @nombre, @anno_cosecha, @precio, @foto)
+				insert into catalogo (ID_Annejado,ID_Procedencia,Nombre,AnnoCosecha,Precio,Foto) values (@id_annejado, @ID_procedencia, @nombre, @anno_cosecha, @precio, @foto)
 				select 1
 			  
 			end
@@ -355,10 +355,21 @@ BEGIN
 	BEGIN TRANSACTION;
 	SAVE TRANSACTION BeforeInsert;
 
+	declare @existe int
+	select @existe=ID from catalogo where ID=@ID_Catalogo
+
 	BEGIN TRY
 		BEGIN
-			Insert into Catalogo_Venta (ID_Catalogo,Cantidad,Subtotal) values (@ID_Catalogo,@Cantidad,@Subtotal)
-			Insert into Temp_IDs_Catalogo_Venta values (scope_identity(),@Identificacion_Cliente)
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+				Insert into Catalogo_Venta (ID_Catalogo,Cantidad,Subtotal) values (@ID_Catalogo,@Cantidad,@Subtotal)
+				Insert into Temp_IDs_Catalogo_Venta (ID_Catalogo_Venta,Identificacion_Cliente) values (scope_identity(),@Identificacion_Cliente)
+				select 1
+			end
+			else
+			begin
+				select 0
+			end
 		END
 	END TRY
 	BEGIN CATCH
@@ -382,43 +393,56 @@ Begin
 
 	declare @acumulado int	
 	select @acumulado=sum(Monto_Total) from Venta where datepart(month,Fecha_Compra)=datepart(month,getdate())
-	declare @id_descuento int, @descuento float
-	select @id_descuento=ID, @descuento=descuento from Descuento where monto_mensual <= @acumulado order by monto_mensual desc
+	declare @id_descuento int, @descuento numeric(4,3)
+	select @id_descuento=ID, @descuento=descuento from Descuento where monto_mensual <= @acumulado and activo=1 order by monto_mensual desc
+
+	declare @existe_metodoPago int, @existe_sucursal int, @existe_usuario int
+	select @existe_metodoPago=ID from Metodo_Pago where ID=@ID_Metodo_Pago
+	select @existe_sucursal=ID from Sucursal where ID=@ID_Sucursal
+	select @existe_usuario=Cedula from Usuario where Cedula=@ID_Usuario
 
 	BEGIN TRY
 		BEGIN
 		--Inserta factura
-			Insert into Venta (ID_Usuario,ID_Sucursal,ID_descuento,ID_Metodo_Pago,Cant_Licores,Total_Items,Impuesto_Venta,Fecha_Compra,Identificacion_Cliente,Monto_Total)
-			   values (@ID_Usuario,@ID_Sucursal,@id_descuento,@ID_Metodo_Pago,@Cantidad_Licores,@Total_Items,
-						case 
-							when @ID_Metodo_Pago = 1 then 0.10
-							else 0
-						end,							
-						getdate(),@Identificacion_Cliente,@Monto_Total)
-
-			--Recupera el id de la ultima insercion de las ventas
-			declare @ID_Venta int
-			set @ID_Venta=SCOPE_IDENTITY()
-			declare @salir int
-			set @salir=0	
-			declare @ID_CV int
-
-			--Relaciona los productos comprados en la tabla Catalogo_venta con la factura (tabla Venta) insertada
-			While @salir=0
+			if((Len(@existe_metodoPago)>0) or (@existe_metodoPago is not null)) and ((Len(@existe_sucursal)>0) or (@existe_sucursal is not null)) and ((Len(@existe_usuario)>0) or (@existe_usuario is not null))
 			begin
-		
-				select top (1) @ID_CV=ID_Catalogo_Venta from Temp_IDs_Catalogo_Venta where Identificacion_Cliente=@Identificacion_Cliente order by ID_Catalogo_Venta desc
+				Insert into Venta (ID_Usuario,ID_Sucursal,ID_descuento,ID_Metodo_Pago,Cant_Licores,Total_Items,Impuesto_Venta,Fecha_Compra,Identificacion_Cliente,Monto_Total)
+				   values (@ID_Usuario,@ID_Sucursal,@id_descuento,@ID_Metodo_Pago,@Cantidad_Licores,@Total_Items,
+							case 
+								when @ID_Metodo_Pago = 1 then 0.10
+								else 0
+							end,							
+							getdate(),@Identificacion_Cliente,@Monto_Total)
 
-				if (Len(@ID_CV)<1) or (@ID_CV is null)
+				--Recupera el id de la ultima insercion de las ventas
+				declare @ID_Venta int
+				set @ID_Venta=SCOPE_IDENTITY()
+				declare @salir int
+				set @salir=0	
+				declare @ID_CV int
+
+				--Relaciona los productos comprados en la tabla Catalogo_venta con la factura (tabla Venta) insertada
+				While @salir=0
 				begin
-					update Catalogo_Venta set ID_Venta=@ID_Venta where ID=@ID_CV
-					delete Temp_IDs_Catalogo_Venta where ID_Catalogo_Venta=@ID_CV
+		
+					select top (1) @ID_CV=ID_Catalogo_Venta from Temp_IDs_Catalogo_Venta where Identificacion_Cliente=@Identificacion_Cliente order by ID_Catalogo_Venta desc
+
+					if (Len(@ID_CV)<1) or (@ID_CV is null)
+					begin
+						update Catalogo_Venta set ID_Venta=@ID_Venta where ID=@ID_CV
+						delete Temp_IDs_Catalogo_Venta where ID_Catalogo_Venta=@ID_CV
+					end
+					else 
+					begin
+						--Sale cuando ya no hay mas productos que relacionar con la factura
+						set @salir=1
+					end
 				end
-				else 
-				begin
-					--Sale cuando ya no hay mas productos que relacionar con la factura
-					set @salir=1
-				end
+				select 1
+			end
+			else
+			begin
+				select 0
 			end
 		END
 	END TRY
@@ -458,7 +482,7 @@ BEGIN
 		BEGIN
 			if((Len(@existe)<1) or (@existe is null)) and ((Len(@existe_ID_Catalogo)>0) or (@existe_ID_Catalogo is not null)) and ((Len(@existe_ID_Sucursal)>0) or (@existe_ID_Sucursal is not null))
 			begin
-			insert into Inventario values (@ID_Producto,@ID_Sucursal,@Cantidad)
+			insert into Inventario (ID_Catalogo,ID_Sucursal,Cantidad) values (@ID_Producto,@ID_Sucursal,@Cantidad)
 				select 1			  
 			end
 			else
@@ -582,7 +606,7 @@ BEGIN
 		BEGIN
 			if(Len(@existe)<1) or (@existe is null)
 			begin
-				insert into Lugar_Procedencia values (@Nombre_Pais)
+				insert into Lugar_Procedencia (Pais) values (@Nombre_Pais)
 				select 1			  
 			end
 			else
@@ -702,7 +726,7 @@ BEGIN
 		BEGIN
 			if(Len(@existe)<1) or (@existe is null)
 			begin
-			insert into TIPO_ANNEJADO values (@Nombre_Annejado,@Descripcion)
+			insert into TIPO_ANNEJADO (Nombre,Descripcion) values (@Nombre_Annejado,@Descripcion)
 				select 1
 			  
 			end
@@ -825,7 +849,7 @@ BEGIN
 		BEGIN
 			if(Len(@existe)>0) or (@existe is not null)
 			begin
-			insert into SUCURSAL values (@Id_Horario,@ID_Direccion,@nombre,@ubicacion)
+			insert into SUCURSAL (ID_Horario,ID_Direccion,Nombre,Ubicacion) values (@Id_Horario,@ID_Direccion,@nombre,@ubicacion)
 				select 1
 			  
 			end
@@ -950,7 +974,7 @@ BEGIN
 		BEGIN
 			if(Len(@existe)<1) or (@existe is null)
 			begin
-			insert into Horario values (@Entrada,@Salida,@Dias)
+			insert into Horario (Entrada,salida,Dias) values (@Entrada,@Salida,@Dias)
 				select 1
 			  
 			end
@@ -1076,7 +1100,7 @@ BEGIN
 		BEGIN
 			if(Len(@existe)<1) or (@existe is null)
 			begin
-			  insert into Direccion values (@Pais,@Provincia,@Canton,@Detalle)
+			  insert into Direccion (Pais,Provincia,Canton,Detalle) values (@Pais,@Provincia,@Canton,@Detalle)
 				select 1
 			  
 			end
@@ -1280,7 +1304,7 @@ BEGIN
 		BEGIN
 			if(Len(@existe)<1) or (@existe is null)
 			begin
-			insert into COMBINACION values (@Nombre_Producto,@Descripcion)
+			insert into COMBINACION (Producto,Descripcion) values (@Nombre_Producto,@Descripcion)
 				select 1
 			  
 			end
@@ -1539,4 +1563,334 @@ END
 go
 
 
+
+
+--------------- CRUD Tipo pago ---------------
+
+-- Insertar Tipo pago
+CREATE PROCEDURE agregarMetodoPago(@Nombre_Metodo varchar(15))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Metodo_Pago where Upper(Nombre)=Upper(@Nombre_Metodo)
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<1) or (@existe is null)
+			begin
+			insert into Metodo_Pago (Nombre) values (@Nombre_Metodo)
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion del metodo de pago',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Actualizar metodo pago 
+CREATE PROCEDURE actualizarMetodoPago (@ID_Metodo_Pago int, @Nombre_Metodo varchar(15))
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Metodo_Pago where ID=@ID_Metodo_Pago
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			update Metodo_Pago set nombre=@Nombre_Metodo where ID=@ID_Metodo_Pago
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del metodo de pago',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar metodo de pago
+CREATE PROCEDURE eliminarMetodoPago (@ID_Metodo_Pago int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Metodo_Pago where id=@ID_Metodo_Pago
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			delete Metodo_Pago where id=@ID_Metodo_Pago
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion del metodo de pago',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Seleccionar Metodo de Pago
+CREATE PROCEDURE seleccionarMetodoPago (@ID_Metodo_Pago int, @Nombre_Metodo_Pago varchar(25))
+AS
+BEGIN
+	select ID, nombre from Metodo_Pago where ID=isnull(@ID_Metodo_Pago,ID) and nombre like '%'+isnull(@Nombre_Metodo_Pago,nombre)+'%'
+END
+GO
+
+
+
+
+
+--------------- CRUD Descuento ---------------
+
+-- Insertar Descuento
+CREATE PROCEDURE agregarDescuento(@descuento numeric(4,3), @monto_mensual int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	declare @activo bit
+	select @existe=id, @activo=activo from Descuento where descuento=@descuento and monto_mensual=@monto_mensual	
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)<1) or (@existe is null)
+			begin
+				insert into Descuento (descuento,monto_mensual) values (@descuento,@monto_mensual)
+				select 1			  
+			end
+			else
+			begin
+				if @activo=0
+				begin
+					update descuento set activo=1 where descuento=@descuento and monto_mensual=@monto_mensual
+					select 1
+				end
+				else
+				begin
+					select 0
+				end
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la insercion del descuento',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+
+-- Actualizar descuento
+CREATE PROCEDURE actualizarDescuento (@ID_Descuento int, @descuento numeric(4,3), @monto_mensual int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from descuento where ID=@ID_Descuento
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			update descuento set descuento=@descuento, monto_mensual=@monto_mensual where ID=@ID_Descuento
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la actualizacion del descuento',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+CREATE PROCEDURE activarDescuento (@ID_Descuento int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from descuento where ID=@ID_Descuento
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+				update descuento set activo=1 where ID=@ID_Descuento
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la activacion del descuento',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+CREATE PROCEDURE desactivarDescuento (@ID_Descuento int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from descuento where ID=@ID_Descuento
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			update descuento set activo=0 where ID=@ID_Descuento
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la desactivacion del descuento',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+-- Eliminar descuento
+CREATE PROCEDURE eliminarDescuento (@ID_Descuento int)
+AS
+BEGIN
+	BEGIN TRANSACTION;
+	SAVE TRANSACTION BeforeInsert;
+
+	declare @existe int
+	select @existe=id from Descuento where id=Descuento
+
+	BEGIN TRY
+		BEGIN
+			if(Len(@existe)>0) or (@existe is not null)
+			begin
+			delete Descuento where id=Descuento
+				select 1
+			  
+			end
+			else
+			begin
+				select 0
+			end
+
+		END
+	END TRY
+	BEGIN CATCH
+		BEGIN
+			raiserror('Ha ocurrido un problema durante la eliminacion del descuento',1,1)
+			ROLLBACK TRANSACTION BeforeInsert;
+		END
+	END CATCH
+
+	COMMIT TRANSACTION
+	RETURN	
+END
+GO
+
+
+
+-- Seleccionar descuento
+CREATE PROCEDURE seleccionarDescuento (@ID_Descuento int, @descuento numeric(4,3))
+AS
+BEGIN
+	select ID, descuento, monto_mensual, activo from Descuento where ID=isnull(@ID_Descuento,ID) and descuento=isnull(@descuento,descuento)
+END
+GO
 --*/
